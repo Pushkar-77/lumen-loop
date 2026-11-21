@@ -14,6 +14,7 @@ interface BriefState {
   growthStack: GrowthStackStages;
   addService: (service: string) => void;
   removeService: (service: string) => void;
+  setServices: (services: string[]) => void;
   setSelectedPlan: (plan: string | null) => void;
   setGrowthStack: (stack: GrowthStackStages) => void;
   clearBrief: () => void;
@@ -59,6 +60,10 @@ export const useBriefStore = create<BriefState>((set, get) => ({
     const next = get().selectedServices.filter((s) => s !== service);
     set({ selectedServices: next });
     saveToSession({ ...get(), selectedServices: next });
+  },
+  setServices: (services) => {
+    set({ selectedServices: services });
+    saveToSession({ ...get(), selectedServices: services });
   },
   setSelectedPlan: (plan) => {
     set({ selectedPlan: plan });
