@@ -1,0 +1,98 @@
+import { create } from "zustand";
+
+const SESSION_KEY = "lumen-brief-state";
+
+export interface GrowthStackStages {
+  awareness: string[];
+  consideration: string[];
+  conversion: string[];
+}
+
+interface BriefState {
+  selectedServices: string[];
+  selectedPlan: string | null;
+  growthStack: GrowthStackStages;
+  addService: (service: string) => void;
+  removeService: (service: string) => void;
+  setSelectedPlan: (plan: string | null) => void;
+  setGrowthStack: (stack: GrowthStackStages) => void;
+  clearBrief: () => void;
+  init: () => void;
+}
+
+const defaultStack: GrowthStackStages = {
+  awareness: [],
+  consideration: [],
+  conversion: [],
+};
+
+export const useBriefStore = create<BriefState>((set, get) => ({
+  selectedServices: [],
+  selectedPlan: null,
+  growthStack: defaultStack,
+  init: () => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = sessionStorage.getItem(SESSION_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          set({
+            selectedServices: parsed.selectedServices || [],
+            selectedPlan: parsed.selectedPlan || null,
+            growthStack: parsed.growthStack || defaultStack,
+          });
+        }
+      } catch (e) {
+        console.error("Failed to parse brief from sessionStorage", e);
+      }
+    }
+  },
+  addService: (service) => {
+    const current = get().selectedServices;
+    if (!current.includes(service)) {
+      const next = [...current, service];
+      set({ selectedServices: next });
+      saveToSession({ ...get(), selectedServices: next });
+    }
+  },
+  removeService: (service) => {
+    const next = get().selectedServices.filter((s) => s !== service);
+    set({ selectedServices: next });
+    saveToSession({ ...get(), selectedServices: next });
+  },
+  setSelectedPlan: (plan) => {
+    set({ selectedPlan: plan });
+    saveToSession({ ...get(), selectedPlan: plan });
+  },
+  setGrowthStack: (stack) => {
+    set({ growthStack: stack });
+    saveToSession({ ...get(), growthStack: stack });
+  },
+  clearBrief: () => {
+    set({ selectedServices: [], selectedPlan: null, growthStack: defaultStack });
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(SESSION_KEY);
+    }
+  },
+}));
+
+function saveToSession(state: {
+  selectedServices: string[];
+  selectedPlan: string | null;
+  growthStack: GrowthStackStages;
+}) {
+  if (typeof window !== "undefined") {
+    try {
+      sessionStorage.setItem(
+        SESSION_KEY,
+        JSON.stringify({
+          selectedServices: state.selectedServices,
+          selectedPlan: state.selectedPlan,
+          growthStack: state.growthStack,
+        })
+      );
+    } catch {
+      // ignore quota exceeded or disabled storage
+    }
+  }
+}

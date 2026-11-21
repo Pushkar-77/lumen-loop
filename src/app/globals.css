@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+@theme {
+  --color-midnight: #0B0F19;
+  --color-midnight-light: #131928;
+  --color-midnight-subtle: #1c2438;
+  --color-alabaster: #FAF9F6;
+  --color-pure-white: #FFFFFF;
+
+  --color-sapphire: #2563EB;
+  --color-sapphire-light: #60A5FA;
+  --color-sapphire-50: #EFF6FF;
+
+  --color-gold: #C8A25A;
+  --color-gold-dark: #8A6B2A;
+  --color-gold-light: #E8D5A3;
+
+  --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: var(--font-serif), Georgia, serif;
+  --font-mono: var(--font-mono), monospace;
+}
+
+:root {
+  --bg-midnight: #0B0F19;
+  --bg-alabaster: #FAF9F6;
+  --sapphire-brand: #2563EB;
+  --gold-brand: #C8A25A;
+}
+
+/* Base resets & typography */
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark light;
+}
+
+body {
+  background-color: #0B0F19;
+  color: #F8FAFC;
+  font-family: var(--font-sans), sans-serif;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glassmorphism rules: Heavy ONLY on navbar, hero HUD & showcase cards */
+.glass-heavy {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-light-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+}
+
+/* WCAG Contrast Utilities */
+.text-gold-on-light {
+  color: #8A6B2A !important; /* WCAG AA 4.5:1+ against #FAF9F6 / #FFFFFF */
+}
+
+.text-sapphire-on-dark {
+  color: #60A5FA !important; /* WCAG AA 4.5:1+ against #0B0F19 */
+}
+
+/* Focus rings for full keyboard accessibility */
+*:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0F19;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(200, 162, 90, 0.4);
+}
+
+/* Shimmer animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #F8FAFC 0%, #C8A25A 50%, #F8FAFC 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 6s infinite linear;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
