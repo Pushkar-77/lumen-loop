@@ -101,10 +101,11 @@ export function AttentionHeatmap() {
         <span>Heatmap Active (Desktop)</span>
         <button
           onClick={toggleHeatmap}
-          className="ml-2 hover:text-white transition-colors cursor-pointer text-slate-400"
+          className="ml-2 hover:text-white transition-colors cursor-pointer text-slate-400 flex items-center"
           title="Turn off heatmap"
+          aria-label="Close heatmap"
         >
-          ✕
+          <span className="text-xs font-mono font-bold leading-none">x</span>
         </button>
       </div>
     </>

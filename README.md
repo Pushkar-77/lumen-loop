@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lumen Loop — Flagship Digital Marketing Agency Platform
 
-## Getting Started
+> **"Marketing that compounds, not just clicks."**  
+> Headquarters: Pune, Maharashtra, India  
+> Localization: INR (₹) / USD ($) with real-time toggle  
+> Quality Target: Awwwards Site of the Day / Level 100 Portfolio Craft  
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Architecture & Tech Stack
+
+- **Framework**: Next.js 15 (App Router) + React 19 + TypeScript
+- **Styling**: Tailwind CSS v4 + PostCSS pipeline
+- **Typography**: Plus Jakarta Sans (UI/Body), Instrument Serif (Editorial Accent), JetBrains Mono (Data/KPIs)
+- **3D Graphics**: Three.js via `@react-three/fiber` and `@react-three/drei` (primitives only, DPR capped at 1.5, static vector fallback for mobile and low-power devices)
+- **Smooth Scroll**: Lenis smooth momentum scrolling with reduced-motion support
+- **State Management**: Zustand stores with persistent storage (cookie for currency, sessionStorage for campaign brief & preloader, localStorage for delight kill-switch)
+- **Forms & Validation**: React Hook Form + Zod + in-memory rate limiting + Resend email handler with dev-mode simulation fallback
+- **Testing**: Playwright e2e + Vitest pure calculation unit tests
+
+---
+
+## Directory Path & Turbopack Recommendation
+
+> **Important**: It is highly recommended to clone or locate this repository in a file path **without spaces** (e.g. `C:\projects\lumen-loop` instead of `C:\Users\Name\Desktop\Path With Spaces\lumen-loop`).
+> 
+> When file paths contain spaces on Windows, Next.js Turbopack workers can experience IPC pipe breaks during PostCSS module evaluation. Moving to a space-free directory allows full native Turbopack support:
+>
+> ### Exact Steps to Move to a Space-Free Directory:
+> 1. Stop any running dev/build processes (`Ctrl + C`).
+> 2. Open PowerShell or Terminal and create a clean root directory:
+>    ```powershell
+>    mkdir C:\projects
+>    ```
+> 3. Copy or move this folder:
+>    ```powershell
+>    robocopy "c:\Users\Pushkar Patil\OneDrive\Desktop\Digisamaksh Digital Marketing design Design" "C:\projects\lumen-loop" /MIR /XD node_modules .next
+>    ```
+> 4. Navigate into the new space-free path:
+>    ```powershell
+>    cd C:\projects\lumen-loop
+>    npm install
+>    npm run dev
+>    ```
+
+---
+
+## Bundler Configuration Note
+
+On Windows environments with spaces in workspace directory paths, Next.js Turbopack worker process spawning can fail during PostCSS asset resolution. To guarantee 100% stable, cross-platform compilation without build worker crashes, both development and production scripts are configured to use the battle-tested Next.js Webpack bundler:
+
+```json
+"scripts": {
+  "dev": "next dev --webpack",
+  "build": "next build --webpack",
+  "start": "next start",
+  "lint": "eslint"
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This guarantees identical styling and module resolution across both dev server and production builds.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment Variables
 
-## Learn More
+Create a `.env.local` file with the following keys:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+# Resend API Key for contact form (optional in development - will use simulation fallback)
+RESEND_API_KEY=re_xxxxxxxxxxxx
+RESEND_FROM_EMAIL=hello@example.com
+RESEND_TO_EMAIL=growth@example.com
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Demo Mode toggle: enables expandable JSON payload drawer upon form completion
+NEXT_PUBLIC_DEMO_MODE=false
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Setup & Verification
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# Install dependencies
+npm install
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Run ESLint
+npm run lint
+
+# Run development server (runs on port 3000)
+npm run dev
+
+# Run production build
+npm run build
+
+# Start production server
+npm run start
+```
+
+---
+
+## Transparency & Content Honesty
+
+All client logos, case studies, metrics, team profiles, and testimonials are **Sample Illustrative Data** designed to showcase world-class engineering, design hierarchy, and full-funnel marketing architecture. All sample elements are explicitly labeled with `Sample` tags in the interface.

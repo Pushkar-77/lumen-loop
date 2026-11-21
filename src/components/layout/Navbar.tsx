@@ -33,10 +33,10 @@ export function Navbar() {
     <>
       <header className="fixed top-0 left-0 right-0 z-[9000] flex justify-center px-4 sm:px-6 pt-4 sm:pt-6 pointer-events-none">
         <nav
-          className={`pointer-events-auto w-full max-w-6xl transition-all duration-300 rounded-full px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between glass-heavy ${
+          className={`pointer-events-auto w-full max-w-6xl transition-all duration-300 rounded-full px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between navbar-surface ${
             isScrolled
-              ? "bg-[#0B0F19]/80 shadow-[0_16px_32px_rgba(0,0,0,0.6)] border-white/15"
-              : "bg-[#0B0F19]/60 border-white/10"
+              ? "shadow-[0_20px_40px_rgba(0,0,0,0.85)] border-white/20"
+              : "border-white/12"
           }`}
           aria-label="Main Navigation"
         >
@@ -77,11 +77,7 @@ export function Navbar() {
                 >
                   {link.label}
                   {isActive && (
-                    <motion.div
-                      layoutId="activeNavPill"
-                      className="absolute inset-0 rounded-full bg-white/10 border border-white/15 -z-10"
-                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                    />
+                    <span className="absolute inset-0 rounded-full bg-white/10 border border-white/15 -z-10 transition-all duration-300" />
                   )}
                 </TransitionLink>
               );

@@ -16,6 +16,7 @@ import {
   Clock,
   ShieldCheck,
   Check,
+  ArrowUpRight,
 } from "lucide-react";
 
 export function Footer() {
@@ -98,21 +99,27 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Capabilities */}
+          {/* Capabilities: 6 Real Services linking to /services */}
           <div className="flex flex-col gap-3">
             <span className="font-mono text-xs uppercase tracking-wider text-[#C8A25A]">
               Capabilities
             </span>
             <ul className="flex flex-col gap-2 text-sm text-slate-400">
-              <li>Semantic SEO Engine</li>
-              <li>Multi-Channel Paid Scaling</li>
-              <li>Lifecycle CRM Automation</li>
-              <li>CRO & Growth Attribution</li>
-              <li>Executive Positioning</li>
+              {siteConfig.services.map((service) => (
+                <li key={service.slug}>
+                  <TransitionLink
+                    href={`/services#${service.slug}`}
+                    className="hover:text-white transition-colors flex items-center justify-between group"
+                  >
+                    <span>{service.title}</span>
+                    <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-[#C8A25A]" />
+                  </TransitionLink>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Connect */}
+          {/* Connect & Placeholder Contact */}
           <div className="flex flex-col gap-3">
             <span className="font-mono text-xs uppercase tracking-wider text-[#C8A25A]">
               Direct Inquiries
@@ -120,11 +127,19 @@ export function Footer() {
             <div className="flex flex-col gap-2 text-sm text-slate-400">
               <a
                 href={`mailto:${siteConfig.contact.email}`}
-                className="hover:text-white transition-colors"
+                className="hover:text-white transition-colors flex items-center gap-1.5"
               >
-                {siteConfig.contact.email}
+                <span>{siteConfig.contact.email}</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-slate-500">
+                  Sample
+                </span>
               </a>
-              <span className="text-xs text-slate-500">{siteConfig.contact.phone}</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-slate-500">{siteConfig.contact.phone}</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-slate-500">
+                  Sample
+                </span>
+              </div>
               <span className="text-xs text-[#E8D5A3] mt-1">{siteConfig.contact.hours}</span>
             </div>
           </div>
@@ -191,7 +206,7 @@ export function Footer() {
               </button>
               {/* Tooltip */}
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:flex px-2.5 py-1 rounded bg-[#131928] border border-white/20 text-[10px] font-mono text-[#E8D5A3] whitespace-nowrap shadow-xl z-50">
-                A/B Testing Hero copy: Variant {variant} (+14.2% simulated lift 😉)
+                A/B Testing Hero copy: Variant {variant} (click to toggle)
               </div>
             </div>
           </div>

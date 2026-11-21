@@ -3,8 +3,9 @@ import { Plus_Jakarta_Sans, Instrument_Serif, JetBrains_Mono } from "next/font/g
 export const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "600", "700"],
   display: "swap",
+  preload: true,
 });
 
 export const fontSerif = Instrument_Serif({
@@ -13,11 +14,13 @@ export const fontSerif = Instrument_Serif({
   weight: "400",
   style: "italic",
   display: "swap",
+  preload: true,
 });
 
 export const fontMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   display: "swap",
+  preload: false,
 });

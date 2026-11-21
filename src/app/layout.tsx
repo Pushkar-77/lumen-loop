@@ -7,8 +7,6 @@ import { Footer } from "@/components/layout/Footer";
 import { Preloader } from "@/components/layout/Preloader";
 import { TransitionCurtains } from "@/components/layout/TransitionCurtains";
 import { ScrollProgress } from "@/components/layout/ScrollProgress";
-import { CustomCursor } from "@/components/fun/CustomCursor";
-import { AttentionHeatmap } from "@/components/fun/AttentionHeatmap";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -55,19 +53,13 @@ export default function RootLayout({
           {/* Route Transition Curtains */}
           <TransitionCurtains />
 
-          {/* Interactive Custom Cursor with +1 CTR ripples */}
-          <CustomCursor />
-
-          {/* Attention Heatmap Canvas */}
-          <AttentionHeatmap />
-
-          {/* Floating Glass Pill Navbar */}
+          {/* Global Sticky Navigation */}
           <Navbar />
 
-          {/* Main Page Content */}
-          <main className="relative z-10 flex-grow pt-24 sm:pt-28">{children}</main>
+          {/* Main Content Area */}
+          <main className="w-full relative z-10 pt-20 sm:pt-24">{children}</main>
 
-          {/* Footer with Portfolio Controls & Live Pune Time */}
+          {/* Global Master Footer */}
           <Footer />
         </AppProviders>
       </body>

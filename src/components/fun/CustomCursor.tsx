@@ -40,12 +40,21 @@ export function CustomCursor() {
 
     const handleMouseMove = (e: MouseEvent) => {
       setPosition({ x: e.clientX, y: e.clientY });
-      setIsVisible(true);
 
       const target = e.target as HTMLElement | null;
       if (target) {
-        const interactive = target.closest("a, button, input, textarea, select, [role='button'], [tabindex='0']");
+        // Hide custom cursor over native form fields so native text selection / caret takes over
+        const isFormField = target.closest("input, textarea, select, [contenteditable='true']");
+        if (isFormField) {
+          setIsVisible(false);
+          return;
+        }
+
+        setIsVisible(true);
+        const interactive = target.closest("a, button, [role='button'], [tabindex='0']");
         setIsPointer(!!interactive);
+      } else {
+        setIsVisible(true);
       }
     };
 
@@ -53,7 +62,16 @@ export function CustomCursor() {
       setIsVisible(false);
     };
 
+    const handleMouseEnter = () => {
+      setIsVisible(true);
+    };
+
     const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) {
+        return;
+      }
+
       const ripple: Ripple = {
         id: nextId++,
         x: e.clientX,
@@ -69,11 +87,13 @@ export function CustomCursor() {
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     document.addEventListener("mouseleave", handleMouseLeave);
+    document.addEventListener("mouseenter", handleMouseEnter);
     window.addEventListener("click", handleClick);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("mouseenter", handleMouseEnter);
       window.removeEventListener("click", handleClick);
     };
   }, [isTouchDevice, prefersReducedMotion, reduceDelight]);
@@ -106,7 +126,7 @@ export function CustomCursor() {
         }}
       />
 
-      {/* Floating "+1 CTR" Click Ripples */}
+      {/* Floating "+1 CTR" Click Ripples with normal word spacing */}
       <AnimatePresence>
         {ripples.map((ripple) => (
           <motion.div
@@ -115,7 +135,7 @@ export function CustomCursor() {
             animate={{ opacity: 0, y: ripple.y - 45, scale: 1.15 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="fixed pointer-events-none z-[9997] select-none font-mono text-[11px] font-bold text-[#E8D5A3] drop-shadow-[0_0_8px_rgba(200,162,90,0.5)]"
+            className="fixed pointer-events-none z-[9997] select-none font-mono text-[11px] font-bold text-[#E8D5A3] drop-shadow-[0_0_8px_rgba(200,162,90,0.5)] tracking-normal"
           >
             +1 CTR
           </motion.div>
