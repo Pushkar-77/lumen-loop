@@ -233,7 +233,7 @@ export default function ContactPage() {
                     <span className="text-[#C8A25A] font-bold">{submissionId}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Response SLA:</span>
+                    <span className="text-slate-400">Estimated Review:</span>
                     <span className="text-white">Within 24 Business Hours</span>
                   </div>
                   <div className="flex justify-between">
@@ -434,12 +434,9 @@ export default function ContactPage() {
                 <div className="flex items-start gap-3">
                   <MapPin className="w-4 h-4 text-[#C8A25A] shrink-0 mt-0.5" />
                   <div>
-                    <strong className="text-white block font-medium">Headquarters</strong>
+                    <strong className="text-white block font-medium">Studio Location</strong>
                     <span className="text-slate-300 leading-relaxed block mt-0.5">
                       {siteConfig.contact.address}
-                    </span>
-                    <span className="text-[11px] font-mono text-slate-400 block mt-1">
-                      Coordinates: 18.5204° N, 73.8567° E
                     </span>
                   </div>
                 </div>

@@ -1,5 +1,7 @@
 "use client";
 
+// TEMPORARY PREVIEW PLACEHOLDER: Studio overview for early preview.
+
 import React from "react";
 import { siteConfig } from "@/content/site";
 import { TransitionLink } from "@/components/ui/TransitionLink";
@@ -75,10 +77,10 @@ export default function AboutPage() {
             <MapPin className="w-6 h-6 text-[#C8A25A]" />
           </div>
           <h2 className="font-sans text-2xl font-bold text-white mb-2">
-            Rooted in Kharadi, Pune
+            Rooted in Pune, India
           </h2>
           <p className="text-slate-300 text-xs sm:text-sm max-w-md mb-6 leading-relaxed">
-            Operating from Pune's technology corridor, serving high-ambition Indian consumer brands
+            Operating from Pune, Maharashtra (Studio address placeholder), serving high-ambition Indian consumer brands
             and global digital platforms with equal precision.
           </p>
           <div className="flex gap-4">

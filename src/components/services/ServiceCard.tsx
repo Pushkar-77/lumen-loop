@@ -29,10 +29,40 @@ export function ServiceCard({ service, isHighlighted = false }: ServiceCardProps
   const [isFlipped, setIsFlipped] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
+  const frontFlipBtnRef = useRef<HTMLButtonElement>(null);
+  const backFlipBtnRef = useRef<HTMLButtonElement>(null);
 
   const { selectedServices, addService, removeService } = useBriefStore();
   const reduceDelight = useDelightStore((s) => s.reduceDelight);
   const isSelected = selectedServices.includes(service.title);
+
+  const flipToBack = () => {
+    setIsFlipped(true);
+    setTimeout(() => {
+      backFlipBtnRef.current?.focus();
+    }, 150);
+  };
+
+  const flipToFront = () => {
+    setIsFlipped(false);
+    setTimeout(() => {
+      frontFlipBtnRef.current?.focus();
+    }, 150);
+  };
+
+  const handleKeyDownToBack = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      flipToBack();
+    }
+  };
+
+  const handleKeyDownToFront = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      flipToFront();
+    }
+  };
 
   // Handle 3D Mouse Tilt on Desktop
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -188,9 +218,13 @@ export function ServiceCard({ service, isHighlighted = false }: ServiceCardProps
           {/* Bottom Flip Trigger */}
           <div className="pt-4 border-t border-white/8 flex items-center justify-between">
             <button
+              ref={frontFlipBtnRef}
               type="button"
-              onClick={() => setIsFlipped(true)}
-              className="flex items-center gap-2 text-xs font-mono text-[#60A5FA] hover:text-[#93C5FD] transition-colors group cursor-pointer"
+              onClick={flipToBack}
+              onKeyDown={handleKeyDownToBack}
+              aria-label={`Flip ${service.title} card for technical stack and sample case snapshot`}
+              aria-expanded={isFlipped}
+              className="flex items-center gap-2 text-xs font-mono text-[#60A5FA] hover:text-[#93C5FD] focus:outline-none focus:ring-2 focus:ring-[#C8A25A] rounded px-1.5 py-1 transition-colors group cursor-pointer"
             >
               <RotateCw className="w-3.5 h-3.5 transition-transform group-hover:rotate-90 duration-300" />
               <span>Flip for Tech Stack & Case Snapshot</span>
@@ -220,9 +254,12 @@ export function ServiceCard({ service, isHighlighted = false }: ServiceCardProps
                 </span>
               </div>
               <button
+                ref={backFlipBtnRef}
                 type="button"
-                onClick={() => setIsFlipped(false)}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-slate-300 hover:text-white transition-colors cursor-pointer"
+                onClick={flipToFront}
+                onKeyDown={handleKeyDownToFront}
+                aria-label={`Flip back to ${service.title} overview`}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-slate-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#C8A25A] transition-colors cursor-pointer"
               >
                 <RotateCw className="w-3 h-3" />
                 <span>Flip Back</span>
@@ -297,7 +334,8 @@ export function ServiceCard({ service, isHighlighted = false }: ServiceCardProps
 
             <button
               type="button"
-              onClick={() => setIsFlipped(false)}
+              onClick={flipToFront}
+              onKeyDown={handleKeyDownToFront}
               className="text-xs font-mono text-slate-400 hover:text-white transition-colors cursor-pointer"
             >
               Overview →

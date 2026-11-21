@@ -63,7 +63,7 @@ export const siteConfig: SiteConfig = {
   contact: {
     email: "hello@example.com", // Placeholder
     phone: "+91 00000 00000", // Placeholder
-    address: "World Trade Center, Kharadi, Pune, Maharashtra 411014",
+    address: "Studio address (placeholder), Pune",
     hours: "Mon – Fri: 9:30 AM – 6:30 PM IST",
     isPlaceholder: true,
   },

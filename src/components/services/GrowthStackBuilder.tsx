@@ -10,17 +10,26 @@ import {
   Sparkles,
   ArrowRight,
   Check,
-  Plus,
   SlidersHorizontal,
-  Flame,
-  ShieldCheck,
-  TrendingUp,
   RotateCcw,
+  GripVertical,
+  ArrowRightLeft,
 } from "lucide-react";
+
+type StageKey = "awareness" | "consideration" | "conversion";
 
 export function GrowthStackBuilder() {
   const { currency } = useCurrencyStore();
-  const { growthStack, setGrowthStack, setServices } = useBriefStore();
+  const { setGrowthStack, setServices } = useBriefStore();
+
+  // Dynamic stage map allowing channels to be moved between stages via Drag-and-Drop or keyboard
+  const [channelStageMap, setChannelStageMap] = useState<Record<string, StageKey>>(() => {
+    const initial: Record<string, StageKey> = {};
+    funnelChannels.forEach((c) => {
+      initial[c.id] = c.stage;
+    });
+    return initial;
+  });
 
   // Selected channel IDs
   const [selectedIds, setSelectedIds] = useState<string[]>([
@@ -31,8 +40,10 @@ export function GrowthStackBuilder() {
   ]);
 
   const [activePreset, setActivePreset] = useState<string>("custom");
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dragOverStage, setDragOverStage] = useState<StageKey | null>(null);
 
-  // Toggle single channel
+  // Toggle single channel selection (Click/Keyboard alternative)
   const toggleChannel = (id: string) => {
     setSelectedIds((prev) => {
       const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
@@ -41,11 +52,81 @@ export function GrowthStackBuilder() {
     setActivePreset("custom");
   };
 
+  // Move channel to next stage (Accessible keyboard alternative to drag-and-drop)
+  const cycleChannelStage = (id: string, e?: React.MouseEvent | React.KeyboardEvent) => {
+    if (e) e.stopPropagation();
+    const current = channelStageMap[id] || "awareness";
+    const nextStage: StageKey =
+      current === "awareness"
+        ? "consideration"
+        : current === "consideration"
+        ? "conversion"
+        : "awareness";
+
+    setChannelStageMap((prev) => ({ ...prev, [id]: nextStage }));
+    if (!selectedIds.includes(id)) {
+      setSelectedIds((prev) => [...prev, id]);
+    }
+    setActivePreset("custom");
+  };
+
+  // Drag and Drop handlers
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData("text/plain", id);
+    e.dataTransfer.effectAllowed = "move";
+    setDraggingId(id);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingId(null);
+    setDragOverStage(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent, stage: StageKey) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (dragOverStage !== stage) {
+      setDragOverStage(stage);
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent, stage: StageKey) => {
+    // Only clear if leaving the container itself
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    if (dragOverStage === stage) {
+      setDragOverStage(null);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, targetStage: StageKey) => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData("text/plain") || draggingId;
+    if (id) {
+      setChannelStageMap((prev) => ({
+        ...prev,
+        [id]: targetStage,
+      }));
+      // Auto-include dropped item into active stack
+      if (!selectedIds.includes(id)) {
+        setSelectedIds((prev) => [...prev, id]);
+      }
+      setActivePreset("custom");
+    }
+    setDraggingId(null);
+    setDragOverStage(null);
+  };
+
   // Apply a preset
   const applyPreset = (presetId: string) => {
     const preset = stackPresets.find((p) => p.id === presetId);
     if (preset) {
       setSelectedIds(preset.channelIds);
+      // Reset stages to default
+      const resetMap: Record<string, StageKey> = {};
+      funnelChannels.forEach((c) => {
+        resetMap[c.id] = c.stage;
+      });
+      setChannelStageMap(resetMap);
       setActivePreset(presetId);
     }
   };
@@ -53,21 +134,26 @@ export function GrowthStackBuilder() {
   // Reset to default
   const resetStack = () => {
     setSelectedIds(["seo-foundation", "google-search-ads", "cro-landing-pages"]);
+    const resetMap: Record<string, StageKey> = {};
+    funnelChannels.forEach((c) => {
+      resetMap[c.id] = c.stage;
+    });
+    setChannelStageMap(resetMap);
     setActivePreset("custom");
   };
 
-  // Filter channels by stage
+  // Filter channels dynamically by their current stage
   const awarenessChannels = useMemo(
-    () => funnelChannels.filter((c) => c.stage === "awareness"),
-    []
+    () => funnelChannels.filter((c) => (channelStageMap[c.id] || c.stage) === "awareness"),
+    [channelStageMap]
   );
   const considerationChannels = useMemo(
-    () => funnelChannels.filter((c) => c.stage === "consideration"),
-    []
+    () => funnelChannels.filter((c) => (channelStageMap[c.id] || c.stage) === "consideration"),
+    [channelStageMap]
   );
   const conversionChannels = useMemo(
-    () => funnelChannels.filter((c) => c.stage === "conversion"),
-    []
+    () => funnelChannels.filter((c) => (channelStageMap[c.id] || c.stage) === "conversion"),
+    [channelStageMap]
   );
 
   // Calculate pricing & synergy
@@ -98,9 +184,15 @@ export function GrowthStackBuilder() {
   const handleSaveToBrief = () => {
     const selectedChannels = funnelChannels.filter((c) => selectedIds.includes(c.id));
     const stack: GrowthStackStages = {
-      awareness: selectedChannels.filter((c) => c.stage === "awareness").map((c) => c.name),
-      consideration: selectedChannels.filter((c) => c.stage === "consideration").map((c) => c.name),
-      conversion: selectedChannels.filter((c) => c.stage === "conversion").map((c) => c.name),
+      awareness: selectedChannels
+        .filter((c) => (channelStageMap[c.id] || c.stage) === "awareness")
+        .map((c) => c.name),
+      consideration: selectedChannels
+        .filter((c) => (channelStageMap[c.id] || c.stage) === "consideration")
+        .map((c) => c.name),
+      conversion: selectedChannels
+        .filter((c) => (channelStageMap[c.id] || c.stage) === "conversion")
+        .map((c) => c.name),
     };
     setGrowthStack(stack);
     setServices(selectedChannels.map((c) => c.name));
@@ -111,6 +203,90 @@ export function GrowthStackBuilder() {
       return `₹${val.toLocaleString("en-IN")}`;
     }
     return `$${val.toLocaleString("en-US")}`;
+  };
+
+  // Helper to render channel cards with drag-and-drop & keyboard support
+  const renderChannelCard = (channel: FunnelChannel, currentStage: StageKey) => {
+    const isChecked = selectedIds.includes(channel.id);
+    const isDragging = draggingId === channel.id;
+
+    return (
+      <div
+        key={channel.id}
+        draggable
+        onDragStart={(e) => handleDragStart(e, channel.id)}
+        onDragEnd={handleDragEnd}
+        onClick={() => toggleChannel(channel.id)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleChannel(channel.id);
+          }
+        }}
+        tabIndex={0}
+        role="checkbox"
+        aria-checked={isChecked}
+        aria-label={`${channel.name}, ${isChecked ? "selected" : "unselected"}. Drag to reorder stages or press Enter to toggle.`}
+        className={`p-3 rounded-xl border transition-all cursor-grab active:cursor-grabbing flex items-start justify-between gap-2.5 focus:outline-none focus:ring-2 focus:ring-[#C8A25A] ${
+          isDragging ? "opacity-40 scale-95" : ""
+        } ${
+          isChecked
+            ? "bg-[#18233C] border-[#3B82F6]/60 shadow-sm"
+            : "bg-white/[0.02] border-white/5 hover:border-white/15"
+        }`}
+      >
+        <div className="flex items-start gap-2 min-w-0">
+          <span
+            className="text-slate-400 hover:text-white cursor-grab active:cursor-grabbing mt-0.5 shrink-0"
+            title="Drag to move between stages"
+          >
+            <GripVertical className="w-3.5 h-3.5" />
+          </span>
+
+          <div className="min-w-0">
+            <div className="font-medium text-xs text-white truncate">
+              {channel.name}
+            </div>
+            <div className="text-[11px] text-slate-300 mt-0.5 leading-snug line-clamp-2">
+              {channel.description}
+            </div>
+            <div className="flex items-center gap-2 mt-1.5">
+              <span className="text-[10px] font-mono text-[#C8A25A]">
+                {currency === "INR"
+                  ? `+₹${channel.monthlyInr.toLocaleString("en-IN")}/mo`
+                  : `+$${channel.monthlyUsd.toLocaleString("en-US")}/mo`}
+              </span>
+              <button
+                type="button"
+                onClick={(e) => cycleChannelStage(channel.id, e)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    cycleChannelStage(channel.id, e);
+                  }
+                }}
+                className="text-[9px] font-mono text-slate-300 hover:text-white bg-white/5 px-1.5 py-0.5 rounded border border-white/10 flex items-center gap-1 cursor-pointer"
+                title="Keyboard action: Move to next funnel stage"
+                aria-label={`Move ${channel.name} to next stage`}
+              >
+                <ArrowRightLeft className="w-2.5 h-2.5" />
+                <span>Move</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors mt-0.5 ${
+            isChecked
+              ? "bg-[#2563EB] border-[#3B82F6] text-white"
+              : "border-white/20 bg-white/5"
+          }`}
+        >
+          {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -124,14 +300,14 @@ export function GrowthStackBuilder() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-[#C8A25A] mb-3">
               <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Interactive Architecture</span>
+              <span>Interactive Architecture · Drag & Drop</span>
             </div>
             <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
               Custom Growth Stack Builder
             </h2>
             <p className="text-slate-300 text-sm sm:text-base max-w-2xl mt-2">
-              Select channels across the three growth stages. Our multi-channel architecture
-              eliminates silos, compounding every rupee or dollar across search, social, and retention.
+              Drag channels between stages or click to toggle. Reallocating channels across
+              Awareness, Consideration, and Conversion compounds every rupee or dollar spent.
             </p>
           </div>
 
@@ -165,10 +341,19 @@ export function GrowthStackBuilder() {
           </div>
         </div>
 
-        {/* 3-Stage Funnel Grid */}
+        {/* 3-Stage Funnel Drag-and-Drop Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
           {/* STAGE 1: Awareness */}
-          <div className="p-6 rounded-2xl bg-[#0F1422] border border-white/10 flex flex-col justify-between">
+          <div
+            onDragOver={(e) => handleDragOver(e, "awareness")}
+            onDragLeave={(e) => handleDragLeave(e, "awareness")}
+            onDrop={(e) => handleDrop(e, "awareness")}
+            className={`p-6 rounded-2xl bg-[#0F1422] border transition-all duration-200 flex flex-col justify-between ${
+              dragOverStage === "awareness"
+                ? "border-[#C8A25A] bg-[#C8A25A]/10 shadow-[0_0_25px_rgba(200,162,90,0.25)]"
+                : "border-white/10"
+            }`}
+          >
             <div>
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                 <div className="flex items-center gap-2">
@@ -187,50 +372,29 @@ export function GrowthStackBuilder() {
                 Capture unbranded demand and command high-intent search real estate.
               </p>
 
-              <div className="space-y-3">
-                {awarenessChannels.map((channel) => {
-                  const isChecked = selectedIds.includes(channel.id);
-                  return (
-                    <div
-                      key={channel.id}
-                      onClick={() => toggleChannel(channel.id)}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
-                        isChecked
-                          ? "bg-[#2563EB]/15 border-[#3B82F6]/60 shadow-sm"
-                          : "bg-white/[0.02] border-white/5 hover:border-white/15"
-                      }`}
-                    >
-                      <div>
-                        <div className="font-medium text-xs text-white">
-                          {channel.name}
-                        </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                          {channel.description}
-                        </div>
-                        <div className="text-[10px] font-mono text-[#C8A25A] mt-1.5">
-                          {currency === "INR"
-                            ? `+₹${channel.monthlyInr.toLocaleString("en-IN")}/mo`
-                            : `+$${channel.monthlyUsd.toLocaleString("en-US")}/mo`}
-                        </div>
-                      </div>
-                      <div
-                        className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors mt-0.5 ${
-                          isChecked
-                            ? "bg-[#2563EB] border-[#3B82F6] text-white"
-                            : "border-white/20 bg-white/5"
-                        }`}
-                      >
-                        {isChecked && <Check className="w-3 h-3" />}
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="space-y-3 min-h-[220px]">
+                {awarenessChannels.length === 0 ? (
+                  <div className="h-32 border-2 border-dashed border-white/10 rounded-xl flex items-center justify-center text-xs font-mono text-slate-500">
+                    Drop channels here
+                  </div>
+                ) : (
+                  awarenessChannels.map((c) => renderChannelCard(c, "awareness"))
+                )}
               </div>
             </div>
           </div>
 
           {/* STAGE 2: Consideration */}
-          <div className="p-6 rounded-2xl bg-[#0F1422] border border-white/10 flex flex-col justify-between">
+          <div
+            onDragOver={(e) => handleDragOver(e, "consideration")}
+            onDragLeave={(e) => handleDragLeave(e, "consideration")}
+            onDrop={(e) => handleDrop(e, "consideration")}
+            className={`p-6 rounded-2xl bg-[#0F1422] border transition-all duration-200 flex flex-col justify-between ${
+              dragOverStage === "consideration"
+                ? "border-[#C8A25A] bg-[#C8A25A]/10 shadow-[0_0_25px_rgba(200,162,90,0.25)]"
+                : "border-white/10"
+            }`}
+          >
             <div>
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                 <div className="flex items-center gap-2">
@@ -249,50 +413,29 @@ export function GrowthStackBuilder() {
                 Nurture educated prospects with data guides, retargeting and founder proof.
               </p>
 
-              <div className="space-y-3">
-                {considerationChannels.map((channel) => {
-                  const isChecked = selectedIds.includes(channel.id);
-                  return (
-                    <div
-                      key={channel.id}
-                      onClick={() => toggleChannel(channel.id)}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
-                        isChecked
-                          ? "bg-[#C8A25A]/15 border-[#C8A25A]/60 shadow-sm"
-                          : "bg-white/[0.02] border-white/5 hover:border-white/15"
-                      }`}
-                    >
-                      <div>
-                        <div className="font-medium text-xs text-white">
-                          {channel.name}
-                        </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                          {channel.description}
-                        </div>
-                        <div className="text-[10px] font-mono text-[#C8A25A] mt-1.5">
-                          {currency === "INR"
-                            ? `+₹${channel.monthlyInr.toLocaleString("en-IN")}/mo`
-                            : `+$${channel.monthlyUsd.toLocaleString("en-US")}/mo`}
-                        </div>
-                      </div>
-                      <div
-                        className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors mt-0.5 ${
-                          isChecked
-                            ? "bg-[#C8A25A] border-[#C8A25A] text-[#0B0F19]"
-                            : "border-white/20 bg-white/5"
-                        }`}
-                      >
-                        {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="space-y-3 min-h-[220px]">
+                {considerationChannels.length === 0 ? (
+                  <div className="h-32 border-2 border-dashed border-white/10 rounded-xl flex items-center justify-center text-xs font-mono text-slate-500">
+                    Drop channels here
+                  </div>
+                ) : (
+                  considerationChannels.map((c) => renderChannelCard(c, "consideration"))
+                )}
               </div>
             </div>
           </div>
 
           {/* STAGE 3: Conversion & Retention */}
-          <div className="p-6 rounded-2xl bg-[#0F1422] border border-white/10 flex flex-col justify-between">
+          <div
+            onDragOver={(e) => handleDragOver(e, "conversion")}
+            onDragLeave={(e) => handleDragLeave(e, "conversion")}
+            onDrop={(e) => handleDrop(e, "conversion")}
+            className={`p-6 rounded-2xl bg-[#0F1422] border transition-all duration-200 flex flex-col justify-between ${
+              dragOverStage === "conversion"
+                ? "border-[#C8A25A] bg-[#C8A25A]/10 shadow-[0_0_25px_rgba(200,162,90,0.25)]"
+                : "border-white/10"
+            }`}
+          >
             <div>
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
                 <div className="flex items-center gap-2">
@@ -311,44 +454,14 @@ export function GrowthStackBuilder() {
                 Convert visitors at the checkout, recover drop-offs, and engineer high LTV.
               </p>
 
-              <div className="space-y-3">
-                {conversionChannels.map((channel) => {
-                  const isChecked = selectedIds.includes(channel.id);
-                  return (
-                    <div
-                      key={channel.id}
-                      onClick={() => toggleChannel(channel.id)}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
-                        isChecked
-                          ? "bg-[#3B82F6]/20 border-[#60A5FA]/60 shadow-sm"
-                          : "bg-white/[0.02] border-white/5 hover:border-white/15"
-                      }`}
-                    >
-                      <div>
-                        <div className="font-medium text-xs text-white">
-                          {channel.name}
-                        </div>
-                        <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                          {channel.description}
-                        </div>
-                        <div className="text-[10px] font-mono text-[#C8A25A] mt-1.5">
-                          {currency === "INR"
-                            ? `+₹${channel.monthlyInr.toLocaleString("en-IN")}/mo`
-                            : `+$${channel.monthlyUsd.toLocaleString("en-US")}/mo`}
-                        </div>
-                      </div>
-                      <div
-                        className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors mt-0.5 ${
-                          isChecked
-                            ? "bg-[#3B82F6] border-[#60A5FA] text-white"
-                            : "border-white/20 bg-white/5"
-                        }`}
-                      >
-                        {isChecked && <Check className="w-3 h-3" />}
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="space-y-3 min-h-[220px]">
+                {conversionChannels.length === 0 ? (
+                  <div className="h-32 border-2 border-dashed border-white/10 rounded-xl flex items-center justify-center text-xs font-mono text-slate-500">
+                    Drop channels here
+                  </div>
+                ) : (
+                  conversionChannels.map((c) => renderChannelCard(c, "conversion"))
+                )}
               </div>
             </div>
           </div>
@@ -356,7 +469,6 @@ export function GrowthStackBuilder() {
 
         {/* Live Calculation & CTA Bar */}
         <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-[#131928] via-[#101626] to-[#0D1220] border border-[#C8A25A]/40 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          {/* Left stats */}
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">
@@ -391,12 +503,11 @@ export function GrowthStackBuilder() {
             </p>
           </div>
 
-          {/* Right Action Button */}
           <div className="w-full md:w-auto">
             <TransitionLink
               href="/contact"
               onClick={handleSaveToBrief}
-              className="w-full md:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#C8A25A] via-[#E8D5A3] to-[#C8A25A] text-[#0B0F19] font-sans font-bold text-sm tracking-wide shadow-[0_4px_25px_rgba(200,162,90,0.35)] hover:shadow-[0_4px_35px_rgba(200,162,90,0.55)] transition-all transform hover:-translate-y-0.5"
+              className="w-full md:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#C8A25A] via-[#E8D5A3] to-[#C8A25A] text-[#0B0F19] font-sans font-bold text-sm tracking-wide shadow-[0_4px_25px_rgba(200,162,90,0.35)] hover:shadow-[0_4px_35px_rgba(200,162,90,0.55)] transition-all transform hover:-translate-y-0.5 cursor-pointer"
             >
               <span>Attach Stack to Growth Brief</span>
               <ArrowRight className="w-4 h-4" />

@@ -45,7 +45,17 @@
 
 ---
 
-## Bundler Configuration Note
+## Application Routes & Implementation Status
+
+- `/` — Flagship Homepage with 2-column Hero, 3D Funnel Diorama, Bento Services, SERP Rank Climber, and Testimonials with Lucide reactions.
+- `/services` — 6 filterable growth disciplines with 3D-tilt & click-to-flip cards + interactive Custom Growth Stack Builder (drag-and-drop & keyboard accessible).
+- `/pricing` — Retainers (Starter ₹24,999 / $299, Growth ₹59,999 / $699, Scale ₹1,49,999 / $1,799) with Monthly/Quarterly (-15%) toggle, comparison matrix, and FAQ.
+- `/roi-lab` — Interactive deterministic ROI calculation engine, lead source distribution, and 3D Revenue Skyline stage.
+- `/contact` — Growth brief intake form with pre-filled state and studio contact details (all addresses marked placeholder).
+- `/work` — *(Temporary Preview Placeholder)* Sample case breakdowns for early review.
+- `/about` — *(Temporary Preview Placeholder)* Studio roots and operating principles for early review.
+
+---
 
 On Windows environments with spaces in workspace directory paths, Next.js Turbopack worker process spawning can fail during PostCSS asset resolution. To guarantee 100% stable, cross-platform compilation without build worker crashes, both development and production scripts are configured to use the battle-tested Next.js Webpack bundler:
 

@@ -56,13 +56,13 @@ export function PricingComparison() {
                   Deliverable / Capability
                 </th>
                 <th className="py-4 px-4 text-xs font-mono uppercase tracking-wider text-slate-300 text-center w-1/5">
-                  Starter Growth
+                  Starter
                 </th>
                 <th className="py-4 px-4 text-xs font-mono uppercase tracking-wider text-[#C8A25A] text-center w-1/5 bg-[#C8A25A]/5 border-x border-[#C8A25A]/20">
-                  Scale Engine ★
+                  Growth ★
                 </th>
                 <th className="py-4 px-4 text-xs font-mono uppercase tracking-wider text-slate-300 text-center w-1/5">
-                  Enterprise Velocity
+                  Scale
                 </th>
               </tr>
             </thead>
@@ -89,10 +89,10 @@ export function PricingComparison() {
                         {renderValue(item.starter)}
                       </td>
                       <td className="py-3.5 px-4 text-center bg-[#C8A25A]/5 border-x border-[#C8A25A]/10">
-                        {renderValue(item.scale)}
+                        {renderValue(item.growth)}
                       </td>
                       <td className="py-3.5 px-4 text-center">
-                        {renderValue(item.enterprise)}
+                        {renderValue(item.scale)}
                       </td>
                     </tr>
                   ))}

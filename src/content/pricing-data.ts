@@ -26,23 +26,23 @@ export interface PricingTier {
 export const pricingTiers: PricingTier[] = [
   {
     id: "starter",
-    name: "Starter Growth",
-    planKey: "starter-growth",
+    name: "Starter",
+    planKey: "starter",
     tagline: "For early-stage brands looking to establish predictable customer acquisition.",
-    badge: "Seed / Early Growth",
+    badge: "Foundational",
     prices: {
       INR: {
-        monthly: 125000,
-        quarterlyPerMonth: 106250, // 15% off: ₹1,06,250/mo (billed ₹3,18,750 quarterly)
+        monthly: 24999,
+        quarterlyPerMonth: 21249, // 15% off: ₹21,249/mo (billed ₹63,747 quarterly)
         billingNotes: "Hand-set Indian domestic retainer. Plus standard GST.",
       },
       USD: {
-        monthly: 1800,
-        quarterlyPerMonth: 1530, // 15% off: $1,530/mo (billed $4,590 quarterly)
+        monthly: 299,
+        quarterlyPerMonth: 254, // 15% off: $254/mo (billed $762 quarterly)
         billingNotes: "Hand-set international tier. Zero cross-border fees.",
       },
     },
-    targetAudience: "Brands spending up to ₹3L ($4k) in ad media monthly, seeking their first systematic compounding channel.",
+    targetAudience: "Brands spending up to ₹1.5L ($2k) in ad media monthly, seeking their first systematic compounding channel.",
     deliverablesSummary: [
       "2 Core Growth Channels (e.g. SEO + Paid Ads or Ads + CRM)",
       "Bi-weekly sprint check-ins & KPI reviews",
@@ -60,25 +60,25 @@ export const pricingTiers: PricingTier[] = [
     ctaLabel: "Select Starter Plan",
   },
   {
-    id: "scale",
-    name: "Scale Engine",
-    planKey: "scale-engine",
+    id: "growth",
+    name: "Growth",
+    planKey: "growth",
     tagline: "Our flagship growth partnership for brands scaling past product-market fit.",
     badge: "Most Popular",
     isPopular: true,
     prices: {
       INR: {
-        monthly: 275000,
-        quarterlyPerMonth: 233750, // 15% off: ₹2,33,750/mo (billed ₹7,01,250 quarterly)
+        monthly: 59999,
+        quarterlyPerMonth: 50999, // 15% off: ₹50,999/mo (billed ₹1,52,997 quarterly)
         billingNotes: "Recommended for high-velocity compounding. Plus standard GST.",
       },
       USD: {
-        monthly: 3600,
-        quarterlyPerMonth: 3060, // 15% off: $3,060/mo (billed $9,180 quarterly)
+        monthly: 699,
+        quarterlyPerMonth: 594, // 15% off: $594/mo (billed $1,782 quarterly)
         billingNotes: "Global scale retainer. Net terms available on quarterly commitments.",
       },
     },
-    targetAudience: "Growth-stage companies spending ₹5L–₹25L ($7k–$30k) monthly across search, social, and lifecycle CRM.",
+    targetAudience: "Growth-stage companies spending ₹2L–₹8L ($3k–$10k) monthly across search, social, and lifecycle CRM.",
     deliverablesSummary: [
       "4 Integrated Growth Channels (SEO, Paid Ads, CRM & CRO)",
       "Weekly sprint check-ins & real-time Slack/WhatsApp channel",
@@ -95,27 +95,27 @@ export const pricingTiers: PricingTier[] = [
       "First-party attribution & Blended MER tracking",
       "Quarterly executive growth summit",
     ],
-    ctaLabel: "Select Scale Engine",
+    ctaLabel: "Select Growth Plan",
   },
   {
-    id: "enterprise",
-    name: "Enterprise Velocity",
-    planKey: "enterprise-velocity",
+    id: "scale",
+    name: "Scale",
+    planKey: "scale",
     tagline: "For category leaders demanding bespoke marketing operations and custom engineering.",
-    badge: "High-Volume Growth",
+    badge: "High-Volume",
     prices: {
       INR: {
-        monthly: 550000,
-        quarterlyPerMonth: 467500, // 15% off: ₹4,67,500/mo (billed ₹14,02,500 quarterly)
+        monthly: 149999,
+        quarterlyPerMonth: 127499, // 15% off: ₹1,27,499/mo (billed ₹3,82,497 quarterly)
         billingNotes: "Custom team allocation & dedicated technical pod. Plus GST.",
       },
       USD: {
-        monthly: 7200,
-        quarterlyPerMonth: 6120, // 15% off: $6,120/mo (billed $18,360 quarterly)
+        monthly: 1799,
+        quarterlyPerMonth: 1529, // 15% off: $1,529/mo (billed $4,587 quarterly)
         billingNotes: "Multi-regional coverage & dedicated growth pod.",
       },
     },
-    targetAudience: "Established enterprises and venture-backed category leaders scaling multi-crore ($100k+) media budgets.",
+    targetAudience: "Established enterprises and category leaders scaling ₹10L+ ($15k+) media budgets.",
     deliverablesSummary: [
       "All 6 Growth Disciplines unlocked simultaneously",
       "Dedicated cross-functional pod (Growth Lead, Data Eng, 2 Creatives)",
@@ -132,7 +132,7 @@ export const pricingTiers: PricingTier[] = [
       "Bi-annual in-person executive strategy retreat in Pune",
       "Dedicated Slack Connect & shared project board",
     ],
-    ctaLabel: "Select Enterprise Plan",
+    ctaLabel: "Select Scale Plan",
   },
 ];
 
@@ -141,8 +141,8 @@ export interface ComparisonCategory {
   items: Array<{
     name: string;
     starter: string | boolean;
+    growth: string | boolean;
     scale: string | boolean;
-    enterprise: string | boolean;
     tooltip?: string;
   }>;
 }
@@ -154,26 +154,26 @@ export const comparisonMatrix: ComparisonCategory[] = [
       {
         name: "Dedicated Growth Lead",
         starter: "Shared (1:4)",
-        scale: "Dedicated (1:2)",
-        enterprise: "Full-Time Dedicated Pod",
+        growth: "Dedicated (1:2)",
+        scale: "Full-Time Dedicated Pod",
       },
       {
         name: "Growth Sprints Cadence",
         starter: "Bi-Weekly",
-        scale: "Weekly",
-        enterprise: "Daily Async + Weekly Live",
+        growth: "Weekly",
+        scale: "Daily Async + Weekly Live",
       },
       {
         name: "Channels Included",
         starter: "2 Channels",
-        scale: "4 Channels",
-        enterprise: "All 6 Disciplines",
+        growth: "4 Channels",
+        scale: "All 6 Disciplines",
       },
       {
         name: "Strategic Roadmapping",
         starter: "Quarterly",
-        scale: "Monthly",
-        enterprise: "Continuous Dynamic",
+        growth: "Monthly",
+        scale: "Continuous Dynamic",
       },
     ],
   },
@@ -183,26 +183,26 @@ export const comparisonMatrix: ComparisonCategory[] = [
       {
         name: "Ad Accounts Managed",
         starter: "Up to 2 Accounts",
-        scale: "Up to 4 Accounts",
-        enterprise: "Unlimited Platforms",
+        growth: "Up to 4 Accounts",
+        scale: "Unlimited Platforms",
       },
       {
         name: "Net New Creative Variations",
         starter: "4 Assets / mo",
-        scale: "12 Assets / mo",
-        enterprise: "Unlimited Iterations",
+        growth: "12 Assets / mo",
+        scale: "Unlimited Iterations",
       },
       {
         name: "Video Production (Shorts/Reels)",
         starter: false,
-        scale: "4 Assets / mo",
-        enterprise: "Bespoke Shoots & Editing",
+        growth: "4 Assets / mo",
+        scale: "Bespoke Shoots & Editing",
       },
       {
         name: "Audience Modeling & CAPI",
         starter: "Standard Pixel",
-        scale: "Server-Side CAPI",
-        enterprise: "Offline Conversion CRM Sync",
+        growth: "Server-Side CAPI",
+        scale: "Offline Conversion CRM Sync",
       },
     ],
   },
@@ -212,20 +212,20 @@ export const comparisonMatrix: ComparisonCategory[] = [
       {
         name: "Technical SEO Audits",
         starter: "Monthly",
-        scale: "Bi-Weekly",
-        enterprise: "Continuous Automated Crawls",
+        growth: "Bi-Weekly",
+        scale: "Continuous Automated Crawls",
       },
       {
         name: "In-Depth Editorial Guides",
         starter: "1 Article / mo",
-        scale: "3 Deep Guides / mo",
-        enterprise: "Comprehensive Editorial Suite",
+        growth: "3 Deep Guides / mo",
+        scale: "Comprehensive Editorial Suite",
       },
       {
         name: "Backlink Acquisition",
         starter: "Foundational (2/mo)",
-        scale: "Authority (5/mo)",
-        enterprise: "Digital PR & Tier-1 Mentions",
+        growth: "Authority (5/mo)",
+        scale: "Digital PR & Tier-1 Mentions",
       },
     ],
   },
@@ -235,20 +235,20 @@ export const comparisonMatrix: ComparisonCategory[] = [
       {
         name: "Reporting Infrastructure",
         starter: "GA4 Looker Dashboard",
-        scale: "Custom Real-Time Portal",
-        enterprise: "BigQuery + Looker + Model Pipeline",
+        growth: "Custom Real-Time Portal",
+        scale: "BigQuery + Looker + Model Pipeline",
       },
       {
         name: "Landing Page CRO Testing",
         starter: "Quarterly Audit",
-        scale: "Continuous A/B Sprints",
-        enterprise: "Full-Funnel Multivariate Suite",
+        growth: "Continuous A/B Sprints",
+        scale: "Full-Funnel Multivariate Suite",
       },
       {
         name: "Front-End Development Support",
         starter: false,
-        scale: "Up to 10 hrs / mo",
-        enterprise: "Dedicated Technical Dev",
+        growth: "Up to 10 hrs / mo",
+        scale: "Dedicated Technical Dev",
       },
     ],
   },
@@ -258,14 +258,14 @@ export const comparisonMatrix: ComparisonCategory[] = [
       {
         name: "Response Time SLA",
         starter: "48 Hours",
-        scale: "24 Hours",
-        enterprise: "4 Hours Priority",
+        growth: "24 Hours",
+        scale: "4 Hours Priority",
       },
       {
         name: "Communication Channels",
         starter: "Email & Client Portal",
-        scale: "Dedicated Slack Channel",
-        enterprise: "Slack Connect + Direct Phone Line",
+        growth: "Dedicated Slack Channel",
+        scale: "Slack Connect + Direct Phone Line",
       },
     ],
   },
@@ -282,7 +282,7 @@ export const pricingFaqs: FaqItem[] = [
     id: "contracts",
     question: "Are retainers bound by long-term contracts?",
     answer:
-      "No. All Lumen Loop monthly retainers operate on rolling 30-day agreements with a simple 30-day notice period. We believe retention is earned every single month through measurable compounding pipeline, not legal lock-in. For quarterly commitments, you receive a guaranteed 15% discount in exchange for three months of strategic runway.",
+      "No. All Lumen Loop monthly retainers (Starter at ₹24,999 / $299, Growth at ₹59,999 / $699, Scale at ₹1,49,999 / $1,799) operate on rolling 30-day agreements with a simple 30-day notice period. We believe retention is earned every single month through measurable compounding pipeline, not legal lock-in. For quarterly commitments, you receive a guaranteed 15% discount in exchange for three months of strategic runway.",
   },
   {
     id: "ad-spend",
@@ -294,7 +294,7 @@ export const pricingFaqs: FaqItem[] = [
     id: "hand-set-pricing",
     question: "Why do you use hand-set INR and USD pricing rather than live exchange rates?",
     answer:
-      "Currency values fluctuate daily, but our clients budget on fixed predictability. We hand-set distinct INR domestic rates for Indian companies and USD rates for international clients to reflect localized economic realities, dedicated regional bandwidth, and regulatory compliance (like Indian GST) without unpredictable currency spikes.",
+      "Currency values fluctuate daily, but our clients budget on fixed predictability. We hand-set distinct domestic INR rates (Starter ₹24,999, Growth ₹59,999, Scale ₹1,49,999) and international USD rates (Starter $299, Growth $699, Scale $1,799) to reflect localized economic realities and regulatory compliance without unpredictable currency spikes.",
   },
   {
     id: "time-to-results",

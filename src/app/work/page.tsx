@@ -1,5 +1,7 @@
 "use client";
 
+// TEMPORARY PREVIEW PLACEHOLDER: Sample case studies for early preview.
+
 import React from "react";
 import { siteConfig } from "@/content/site";
 import { TransitionLink } from "@/components/ui/TransitionLink";
