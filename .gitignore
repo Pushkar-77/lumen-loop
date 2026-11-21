@@ -42,3 +42,8 @@ lighthouse*.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# logs and screenshots
+*.log
+screenshots/
+*.local
