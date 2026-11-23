@@ -55,8 +55,8 @@ export const siteConfig: SiteConfig = {
     full: "Pune, Maharashtra, India",
     timezone: "Asia/Kolkata",
     coordinates: {
-      lat: 18.5204,
-      lng: 73.8567,
+      lat: 0,
+      lng: 0,
     },
   },
   // PLACEHOLDER CONTACT DETAILS (Clearly labelled per specification)
