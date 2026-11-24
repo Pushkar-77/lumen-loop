@@ -1,5 +1,4 @@
 import { chromium } from "playwright";
-import fs from "fs";
 
 const LIVE_URL = "https://lumen-loop-alpha.vercel.app";
 const PSI_ENDPOINT = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(

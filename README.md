@@ -52,7 +52,7 @@
 - `/pricing` — Retainers (Starter ₹24,999 / $299, Growth ₹59,999 / $699, Scale ₹1,49,999 / $1,799) with Monthly/Quarterly (-15%) toggle, comparison matrix, and FAQ.
 - `/roi-lab` — Interactive deterministic ROI calculation engine, lead source distribution, and 3D Revenue Skyline stage.
 - `/contact` — Growth brief intake form with pre-filled state and studio contact details (all addresses marked placeholder).
-- `/work` — *(Temporary Preview Placeholder)* Sample case breakdowns for early review.
+- `/work` & `/work/[slug]` — 6 filterable case studies with interactive Before/After metric toggles, currency synchronization, single-scale SVG comparison charts, and dynamic static breakdown pages.
 - `/about` — *(Temporary Preview Placeholder)* Studio roots and operating principles for early review.
 
 ---

@@ -88,7 +88,7 @@ function SkylineBar({
       {/* Floating 3D HTML Tooltip on Hover */}
       {isHovered && (
         <Html
-          position={[0, Math.max(1.5, currentHeight.current + 0.6), 0]}
+          position={[0, Math.max(1.5, targetHeight + 0.6), 0]}
           center
           distanceFactor={10}
         >
@@ -130,8 +130,6 @@ function SkylineGrowthLine({
   channels: ChannelRoiOutput[];
   maxRevenue: number;
 }) {
-  const lineRef = useRef<THREE.Line>(null);
-
   const points = useMemo(() => {
     const pts: THREE.Vector3[] = [];
     const spacing = 1.35;

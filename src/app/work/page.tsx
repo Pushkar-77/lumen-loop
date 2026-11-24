@@ -1,55 +1,53 @@
 "use client";
 
-// TEMPORARY PREVIEW PLACEHOLDER: Sample case studies for early preview.
-
-import React from "react";
-import { siteConfig } from "@/content/site";
+import React, { useState } from "react";
+import { caseStudies } from "@/content/case-studies";
+import { CaseStudyCard } from "@/components/work/CaseStudyCard";
+import { useCurrencyStore } from "@/stores/currency";
 import { TransitionLink } from "@/components/ui/TransitionLink";
-import { Sparkles, ArrowRight, ExternalLink, TrendingUp, BarChart3 } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export default function WorkPage() {
-  const sampleCaseStudies = [
-    {
-      client: "Aura Consumer Labs",
-      industry: "D2C Personal Care · Mumbai",
-      metric: "4.8x ROAS",
-      detail: "Scalable Meta & Google PMax acquisition restructuring with first-party attribution modeling.",
-      tag: "Paid Acquisition & CRO",
-      tagline: "From volatile ad performance to 120-day compounding CAC stability.",
-    },
-    {
-      client: "Kavach Cyber Defense",
-      industry: "Enterprise B2B SaaS · Pune",
-      metric: "+210% Pipeline",
-      detail: "Technical SEO keyword clustering and comparison guide authority that closed enterprise RFPs.",
-      tag: "Organic Search & Content",
-      tagline: "Outranking global incumbents across top high-intent security search terms.",
-    },
-    {
-      client: "Vedic Botanics",
-      industry: "Luxury Wellness · Bengaluru",
-      metric: "38% Repeat LTV",
-      detail: "Automated Klaviyo behavioral lifecycle flows and VIP segmentation lifting 90-day repeat frequency.",
-      tag: "Retention CRM",
-      tagline: "Transforming single-order buyers into loyal brand ambassadors.",
-    },
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const { currency, toggleCurrency } = useCurrencyStore();
+
+  const categories = [
+    "All",
+    "SEO",
+    "Paid Ads",
+    "Social",
+    "Email & Automation",
+    "Content",
+    "Analytics/CRO",
   ];
+
+  const filteredCaseStudies =
+    selectedCategory === "All"
+      ? caseStudies
+      : caseStudies.filter((c) => c.serviceCategory === selectedCategory);
 
   return (
     <div className="w-full min-h-screen pt-28 sm:pt-36 pb-20 bg-[#0B0F19] text-white">
+      {/* Background ambient radial atmosphere */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-[#2563EB]/10 rounded-full blur-[160px]" />
+        <div className="absolute top-1/2 right-10 w-[500px] h-[500px] bg-[#C8A25A]/5 rounded-full blur-[140px]" />
+      </div>
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        {/* Page Hero Header */}
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-[#C8A25A] mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C8A25A] animate-pulse" />
-            <span>Case Snapshots</span>
+            <span>Sample Case Studies</span>
             <span className="text-white/40">·</span>
-            <span>Sample Studies</span>
+            <span>Illustrative Outcomes</span>
           </div>
 
           <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-5">
-            Real Impact. <br />
+            Measurable Systems. <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-[#FAF9F6] via-[#E8D5A3] to-[#C8A25A] bg-clip-text text-transparent">
-              Compounding Evidence.
+              Compounding Proof.
             </span>
           </h1>
 
@@ -57,75 +55,86 @@ export default function WorkPage() {
             Explore sample case breakdowns demonstrating how unified search, performance ads,
             and lifecycle CRM systematically compound revenue across Indian and global brands.
           </p>
+
+          {/* Currency Toggle */}
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={toggleCurrency}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-slate-300 transition-colors cursor-pointer"
+              title="Click to toggle currency between INR and USD"
+            >
+              <span className="text-slate-400">Currency Mode:</span>
+              <span className="font-bold text-[#C8A25A]">{currency}</span>
+              <span className="text-[10px] text-slate-400">
+                (Click to switch to {currency === "INR" ? "USD" : "INR"})
+              </span>
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {sampleCaseStudies.map((item, idx) => (
-            <div
-              key={idx}
-              className="p-7 rounded-3xl bg-[#0F1422] border border-white/10 flex flex-col justify-between hover:border-white/20 transition-all"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-[11px] font-mono text-[#C8A25A] uppercase tracking-wider">
-                    {item.tag}
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
-                    Sample
-                  </span>
-                </div>
-
-                <h3 className="font-sans text-xl font-bold text-white mb-1">
-                  {item.client}
-                </h3>
-                <div className="text-xs text-slate-400 font-mono mb-4">
-                  {item.industry}
-                </div>
-
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-[#2563EB]/15 to-[#C8A25A]/15 border border-[#C8A25A]/30 mb-5">
-                  <div className="font-mono text-3xl font-extrabold text-[#C8A25A] mb-1">
-                    {item.metric}
-                  </div>
-                  <div className="text-xs text-slate-300 font-medium">
-                    {item.tagline}
-                  </div>
-                </div>
-
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  {item.detail}
-                </p>
-              </div>
-
-              <div className="pt-5 mt-6 border-t border-white/10 flex items-center justify-between">
-                <span className="text-[10px] font-mono text-slate-400">
-                  Full study available on inquiry
-                </span>
-                <TransitionLink
-                  href="/contact"
-                  className="text-xs font-mono text-[#C8A25A] hover:text-[#E8D5A3] flex items-center gap-1 cursor-pointer"
+        {/* Filter Pills */}
+        <div className="flex items-center justify-start sm:justify-center overflow-x-auto pb-4 mb-10 gap-2 no-scrollbar">
+          {categories.map((cat) => {
+            const count =
+              cat === "All"
+                ? caseStudies.length
+                : caseStudies.filter((c) => c.serviceCategory === cat).length;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-full text-xs font-mono whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${selectedCategory === cat
+                    ? "bg-[#C8A25A] text-[#0B0F19] font-bold shadow-lg shadow-[#C8A25A]/20"
+                    : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                  }`}
+              >
+                <span>{cat}</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${selectedCategory === cat
+                      ? "bg-[#0B0F19] text-[#E8D5A3]"
+                      : "bg-white/10 text-slate-400"
+                    }`}
                 >
-                  <span>Inquire</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </TransitionLink>
-              </div>
-            </div>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 6 Case Studies Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-20">
+          {filteredCaseStudies.map((cs) => (
+            <CaseStudyCard key={cs.slug} caseStudy={cs} />
           ))}
         </div>
 
-        {/* CTA */}
+        {/* Bottom CTA Band */}
         <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-[#131928] to-[#0B0F19] border border-white/10 text-center flex flex-col items-center">
+          <div className="w-12 h-12 rounded-2xl bg-[#C8A25A]/10 border border-[#C8A25A]/30 flex items-center justify-center mb-5">
+            <Sparkles className="w-6 h-6 text-[#C8A25A]" />
+          </div>
           <h2 className="font-sans text-2xl sm:text-3xl font-bold text-white mb-3">
-            Want to see how this applies to your brand?
+            Want to see how this architecture applies to your brand?
           </h2>
-          <p className="text-slate-300 text-xs sm:text-sm max-w-md mb-6">
-            We will review your organic rankings and ad structure to identify compounding revenue opportunities.
+          <p className="text-slate-300 text-xs sm:text-sm max-w-lg mb-8 leading-relaxed">
+            Our Pune studio reviews your current search rankings, ad spend efficiency, and
+            retention metrics to identify high-leverage compounding opportunities upfront.
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <TransitionLink
               href="/services"
-              className="px-6 py-3 rounded-full bg-[#C8A25A] text-[#0B0F19] font-bold text-xs font-mono shadow-md"
+              className="px-6 py-3 rounded-full bg-[#C8A25A] hover:bg-[#E8D5A3] text-[#0B0F19] font-sans font-bold text-xs font-mono shadow-md transition-all hover:scale-105"
             >
-              Explore Growth Stack Builder →
+              Build Custom Growth Stack →
+            </TransitionLink>
+            <TransitionLink
+              href="/contact"
+              className="px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 text-white border border-white/15 text-xs font-mono transition-all"
+            >
+              Request Illustrative Audit
             </TransitionLink>
           </div>
         </div>

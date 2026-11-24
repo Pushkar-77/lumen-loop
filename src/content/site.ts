@@ -8,10 +8,6 @@ export interface SiteConfig {
     country: string;
     full: string;
     timezone: string;
-    coordinates: {
-      lat: number;
-      lng: number;
-    };
   };
   contact: {
     email: string; // Placeholder contact email
@@ -54,10 +50,6 @@ export const siteConfig: SiteConfig = {
     country: "India",
     full: "Pune, Maharashtra, India",
     timezone: "Asia/Kolkata",
-    coordinates: {
-      lat: 0,
-      lng: 0,
-    },
   },
   // PLACEHOLDER CONTACT DETAILS (Clearly labelled per specification)
   contact: {

@@ -7,7 +7,7 @@ import { PricingComparison } from "@/components/pricing/PricingComparison";
 import { PricingFaq } from "@/components/pricing/PricingFaq";
 import { useCurrencyStore } from "@/stores/currency";
 import { TransitionLink } from "@/components/ui/TransitionLink";
-import { Sparkles, ShieldCheck, ArrowRight } from "lucide-react";
+import { ShieldCheck, ArrowRight } from "lucide-react";
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "quarterly">("monthly");
@@ -39,7 +39,7 @@ export default function PricingPage() {
           </h1>
 
           <p className="font-sans text-base sm:text-lg text-slate-300 leading-relaxed text-balance">
-            We don't take a percentage of your media spend or hold your ad accounts hostage.
+            We don&apos;t take a percentage of your media spend or hold your ad accounts hostage.
             Choose a dedicated growth retainer with hand-set domestic INR or international USD pricing.
           </p>
 

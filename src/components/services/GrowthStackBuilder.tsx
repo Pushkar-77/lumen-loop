@@ -6,7 +6,6 @@ import { useCurrencyStore } from "@/stores/currency";
 import { useBriefStore, GrowthStackStages } from "@/stores/brief";
 import { TransitionLink } from "@/components/ui/TransitionLink";
 import {
-  Layers,
   Sparkles,
   ArrowRight,
   Check,
@@ -206,7 +205,7 @@ export function GrowthStackBuilder() {
   };
 
   // Helper to render channel cards with drag-and-drop & keyboard support
-  const renderChannelCard = (channel: FunnelChannel, currentStage: StageKey) => {
+  const renderChannelCard = (channel: FunnelChannel) => {
     const isChecked = selectedIds.includes(channel.id);
     const isDragging = draggingId === channel.id;
 
@@ -378,7 +377,7 @@ export function GrowthStackBuilder() {
                     Drop channels here
                   </div>
                 ) : (
-                  awarenessChannels.map((c) => renderChannelCard(c, "awareness"))
+                  awarenessChannels.map((c) => renderChannelCard(c))
                 )}
               </div>
             </div>
@@ -419,7 +418,7 @@ export function GrowthStackBuilder() {
                     Drop channels here
                   </div>
                 ) : (
-                  considerationChannels.map((c) => renderChannelCard(c, "consideration"))
+                  considerationChannels.map((c) => renderChannelCard(c))
                 )}
               </div>
             </div>
@@ -460,7 +459,7 @@ export function GrowthStackBuilder() {
                     Drop channels here
                   </div>
                 ) : (
-                  conversionChannels.map((c) => renderChannelCard(c, "conversion"))
+                  conversionChannels.map((c) => renderChannelCard(c))
                 )}
               </div>
             </div>

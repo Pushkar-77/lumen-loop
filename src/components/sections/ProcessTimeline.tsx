@@ -66,8 +66,10 @@ export function ProcessTimeline() {
     // Under reduced motion: default to final #1 state
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) {
-      setSelectedRankIdx(4);
-      return;
+      const timer = setTimeout(() => {
+        setSelectedRankIdx(4);
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     const handleScroll = () => {

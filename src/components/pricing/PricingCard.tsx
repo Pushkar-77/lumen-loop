@@ -5,7 +5,7 @@ import { PricingTier } from "@/content/pricing-data";
 import { useCurrencyStore } from "@/stores/currency";
 import { useBriefStore } from "@/stores/brief";
 import { TransitionLink } from "@/components/ui/TransitionLink";
-import { Check, Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
+import { Check, Sparkles, ArrowRight } from "lucide-react";
 
 interface PricingCardProps {
   tier: PricingTier;
@@ -109,7 +109,7 @@ export function PricingCard({ tier, billingCycle }: PricingCardProps) {
         {/* Deliverables Checklist */}
         <div className="space-y-3 mb-8">
           <span className="text-[11px] font-mono text-[#C8A25A] uppercase tracking-wider block">
-            What's Included
+            What&apos;s Included
           </span>
           {tier.deliverablesSummary.map((item, idx) => (
             <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">

@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { servicesData, ServiceItem } from "@/content/services-data";
+import { servicesData } from "@/content/services-data";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { GrowthStackBuilder } from "@/components/services/GrowthStackBuilder";
 import { TransitionLink } from "@/components/ui/TransitionLink";
-import { Sparkles, ArrowRight, CheckCircle2, SlidersHorizontal } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -16,7 +16,9 @@ export default function ServicesPage() {
     if (typeof window !== "undefined") {
       const hash = window.location.hash.replace("#", "");
       if (hash) {
-        setHighlightedId(hash);
+        const timer = setTimeout(() => {
+          setHighlightedId(hash);
+        }, 0);
         const el = document.getElementById(hash);
         if (el) {
           setTimeout(() => {
@@ -26,6 +28,7 @@ export default function ServicesPage() {
             setHighlightedId(null);
           }, 3000);
         }
+        return () => clearTimeout(timer);
       }
     }
   }, []);

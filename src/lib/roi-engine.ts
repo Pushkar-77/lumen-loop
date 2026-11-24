@@ -11,7 +11,17 @@ export interface ChannelBenchmark {
   color: string; // brand-compliant visualization color (sapphire, gold, sky)
 }
 
-export const ROI_BENCHMARKS: Record<string, ChannelBenchmark> = {
+/**
+ * DISCLAIMER: Illustrative benchmark rates based on historical mid-market performance models.
+ * Not a financial guarantee. All outputs are illustrative scenario projections.
+ */
+export const ROI_DISCLAIMER =
+  "Illustrative benchmark rates based on historical mid-market performance models. Not a financial guarantee.";
+
+/**
+ * Illustrative benchmark rates per channel (illustrative estimates for modeling).
+ */
+export const ILLUSTRATIVE_ROI_BENCHMARKS: Record<string, ChannelBenchmark> = {
   seo: {
     id: "seo",
     name: "Technical SEO & Search",
@@ -64,8 +74,7 @@ export const ROI_BENCHMARKS: Record<string, ChannelBenchmark> = {
   },
 };
 
-export const ROI_DISCLAIMER =
-  "Illustrative benchmark rates based on historical mid-market performance models. Not a financial guarantee.";
+export const ROI_BENCHMARKS = ILLUSTRATIVE_ROI_BENCHMARKS;
 
 export interface RoiEngineInput {
   monthlyBudget: number;

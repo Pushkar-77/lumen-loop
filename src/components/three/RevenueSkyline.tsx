@@ -58,16 +58,21 @@ export function RevenueSkyline({ channels, currency, maxRevenue }: RevenueSkylin
     }
 
     // Schedule 3D scene loading only after idle
-    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-      const handle = (window as any).requestIdleCallback(
+    type WindowWithIdle = Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    const win = window as WindowWithIdle;
+    if (typeof window !== "undefined" && typeof win.requestIdleCallback === "function") {
+      const handle = win.requestIdleCallback(
         () => setIsIdleLoaded(true),
         { timeout: 1500 }
       );
       return () => {
         window.removeEventListener("resize", checkWidth);
         observer.disconnect();
-        if ("cancelIdleCallback" in window) {
-          (window as any).cancelIdleCallback(handle);
+        if (typeof win.cancelIdleCallback === "function") {
+          win.cancelIdleCallback(handle);
         }
       };
     } else {

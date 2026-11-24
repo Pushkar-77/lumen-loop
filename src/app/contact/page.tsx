@@ -13,10 +13,7 @@ import {
   Clock,
   Mail,
   Phone,
-  FileText,
   X,
-  Layers,
-  ArrowRight,
   ShieldCheck,
   Building2,
 } from "lucide-react";
@@ -49,10 +46,13 @@ export default function ContactPage() {
   // Hydrate channels from brief store on first load if available
   useEffect(() => {
     if (selectedServices.length > 0) {
-      setFormData((prev) => ({
-        ...prev,
-        channels: Array.from(new Set([...prev.channels, ...selectedServices])),
-      }));
+      const timer = setTimeout(() => {
+        setFormData((prev) => ({
+          ...prev,
+          channels: Array.from(new Set([...prev.channels, ...selectedServices])),
+        }));
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [selectedServices]);
 
@@ -148,7 +148,7 @@ export default function ContactPage() {
           </div>
 
           <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-5">
-            Let's Build Something <br className="hidden sm:inline" />
+            Let&apos;s Build Something <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-[#FAF9F6] via-[#E8D5A3] to-[#C8A25A] bg-clip-text text-transparent">
               Measurable.
             </span>

@@ -3,9 +3,8 @@
 // TEMPORARY PREVIEW PLACEHOLDER: Studio overview for early preview.
 
 import React from "react";
-import { siteConfig } from "@/content/site";
 import { TransitionLink } from "@/components/ui/TransitionLink";
-import { Sparkles, MapPin, ShieldCheck, HeartHandshake, Award, ArrowRight } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 export default function AboutPage() {
   const values = [
@@ -15,7 +14,7 @@ export default function AboutPage() {
     },
     {
       title: "First-Party Attribution",
-      desc: "We don't rely on platform-reported inflated metrics. Every rupee and dollar is audited against clean first-party server-side data.",
+      desc: "We don&apos;t rely on platform-reported inflated metrics. Every rupee and dollar is audited against clean first-party server-side data.",
     },
     {
       title: "Capped Client Roster",

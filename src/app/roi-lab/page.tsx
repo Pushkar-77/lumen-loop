@@ -6,23 +6,14 @@ import {
   formatCurrency,
   ROI_BENCHMARKS,
   ROI_DISCLAIMER,
-  ChannelRoiOutput,
 } from "@/lib/roi-engine";
 import { useCurrencyStore } from "@/stores/currency";
 import { useBriefStore, GrowthStackStages } from "@/stores/brief";
 import { RevenueSkyline } from "@/components/three/RevenueSkyline";
 import { TransitionLink } from "@/components/ui/TransitionLink";
 import {
-  Calculator,
-  Sparkles,
   ArrowRight,
-  TrendingUp,
-  Layers,
   Sliders,
-  DollarSign,
-  Users,
-  Target,
-  BarChart3,
   Check,
 } from "lucide-react";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { ServiceItem } from "@/content/services-data";
 import { useBriefStore } from "@/stores/brief";
 import { useDelightStore } from "@/stores/delight";
@@ -14,9 +14,7 @@ import {
   Check,
   RotateCw,
   Plus,
-  ArrowRight,
   Cpu,
-  Layers,
   Sparkles,
 } from "lucide-react";
 
