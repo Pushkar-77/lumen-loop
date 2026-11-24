@@ -256,7 +256,7 @@ export default function RoiLabPage() {
           </div>
 
           {/* 3D Revenue Skyline Stage Column (7 cols) */}
-          <div className="lg:col-span-7 flex flex-col gap-6">
+          <div className="lg:col-span-7 flex flex-col gap-4">
             {/* Real-time 3D Skyline Stage with Accessible 2D Fallback */}
             <RevenueSkyline
               channels={roiOutput.channels}
@@ -264,13 +264,13 @@ export default function RoiLabPage() {
               maxRevenue={maxRevenue}
             />
 
-            {/* Summary Metrics Bar */}
+            {/* Summary Metrics Bar — grid with gap, tabular nums, wraps on small screens */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-5 rounded-2xl bg-[#0F1422] border border-white/10">
               <div>
                 <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-1">
                   Total Leads
                 </span>
-                <div className="font-mono text-xl sm:text-2xl font-bold text-white">
+                <div className="font-mono text-lg sm:text-xl font-bold text-white tabular-nums">
                   {roiOutput.totals.totalLeads.toLocaleString()}
                 </div>
               </div>
@@ -279,7 +279,7 @@ export default function RoiLabPage() {
                 <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-1">
                   Total Customers
                 </span>
-                <div className="font-mono text-xl sm:text-2xl font-bold text-[#60A5FA]">
+                <div className="font-mono text-lg sm:text-xl font-bold text-[#60A5FA] tabular-nums">
                   {roiOutput.totals.totalCustomers.toLocaleString()}
                 </div>
               </div>
@@ -288,7 +288,7 @@ export default function RoiLabPage() {
                 <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-1">
                   Projected Revenue
                 </span>
-                <div className="font-mono text-xl sm:text-2xl font-black text-[#C8A25A]">
+                <div className="font-mono text-lg sm:text-xl font-black text-[#C8A25A] tabular-nums break-all">
                   {formatCurrency(roiOutput.totals.totalRevenue, currency)}
                 </div>
               </div>
@@ -297,7 +297,7 @@ export default function RoiLabPage() {
                 <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-1">
                   Blended ROAS
                 </span>
-                <div className="font-mono text-xl sm:text-2xl font-bold text-white">
+                <div className="font-mono text-lg sm:text-xl font-bold text-white tabular-nums">
                   {roiOutput.totals.blendedRoas}x
                 </div>
               </div>

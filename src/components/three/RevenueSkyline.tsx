@@ -88,10 +88,10 @@ export function RevenueSkyline({ channels, currency, maxRevenue }: RevenueSkylin
   const canRender3D = isDesktop && isIdleLoaded && !reduceDelight;
 
   return (
-    <div ref={containerRef} className="w-full h-full min-h-[380px] sm:min-h-[440px] relative">
+    <div ref={containerRef} className="w-full relative">
       {/* 2D Accessible Fallback: Shown on mobile, reduced motion, or until 3D is idle-loaded */}
       <div
-        className={`w-full h-full transition-opacity duration-700 ${
+        className={`w-full transition-opacity duration-700 ${
           canRender3D ? "opacity-0 pointer-events-none absolute inset-0" : "opacity-100"
         }`}
       >
@@ -104,7 +104,7 @@ export function RevenueSkyline({ channels, currency, maxRevenue }: RevenueSkylin
 
       {/* 3D WebGL Scene: Desktop >=1024px only after idle */}
       {canRender3D && (
-        <div className="w-full h-full animate-fadeIn transition-opacity duration-700">
+        <div className="w-full animate-fadeIn transition-opacity duration-700">
           <RevenueSkylineScene
             channels={channels}
             currency={currency}

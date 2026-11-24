@@ -23,6 +23,15 @@ interface SkylineBarProps {
   onHover: (id: string | null) => void;
 }
 
+// Short channel label map for the HTML legend
+const CHANNEL_LABELS: Record<string, string> = {
+  seo: "SEO",
+  "google-search": "Search",
+  "meta-ads": "Paid Social",
+  "email-crm": "Email",
+  cro: "CRO",
+};
+
 function SkylineBar({
   channel,
   index,
@@ -42,7 +51,6 @@ function SkylineBar({
 
   useFrame((_, delta) => {
     if (!meshRef.current) return;
-    // Smooth lerp toward target height (clamped between 0.2 and 4.0)
     const target = Math.max(0.2, targetHeight);
     currentHeight.current = THREE.MathUtils.damp(currentHeight.current, target, 8, delta);
     meshRef.current.scale.set(1, currentHeight.current, 1);
@@ -85,7 +93,7 @@ function SkylineBar({
         </mesh>
       </group>
 
-      {/* Floating 3D HTML Tooltip on Hover */}
+      {/* Floating 3D HTML Tooltip on Hover — no ground labels */}
       {isHovered && (
         <Html
           position={[0, Math.max(1.5, targetHeight + 0.6), 0]}
@@ -94,7 +102,7 @@ function SkylineBar({
         >
           <div className="pointer-events-none p-3 rounded-xl bg-[#0B0F19]/95 border border-[#C8A25A]/60 shadow-2xl backdrop-blur-md min-w-[170px] text-center space-y-1">
             <span className="text-[10px] font-mono text-[#C8A25A] uppercase tracking-wider block font-bold">
-              {channel.channelName}
+              {CHANNEL_LABELS[channel.channelId] ?? channel.channelId.toUpperCase()}
             </span>
             <div className="font-mono text-base font-extrabold text-white">
               {formatCurrency(channel.revenue, currency)}
@@ -106,18 +114,6 @@ function SkylineBar({
           </div>
         </Html>
       )}
-
-      {/* Ground Label */}
-      <Html position={[0, -0.25, 0]} center distanceFactor={11}>
-        <div className="pointer-events-none text-center whitespace-nowrap">
-          <div className="text-[10px] font-mono font-bold text-slate-200">
-            {channel.channelId.toUpperCase()}
-          </div>
-          <div className="text-[9px] font-mono text-[#C8A25A]">
-            {formatCurrency(channel.revenue, currency)}
-          </div>
-        </div>
-      </Html>
     </group>
   );
 }
@@ -172,71 +168,102 @@ export function RevenueSkylineScene({
 }: RevenueSkylineSceneProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
+  // Short label map
+  const CHANNEL_LABELS: Record<string, string> = {
+    seo: "SEO",
+    "google-search": "Search",
+    "meta-ads": "Paid Social",
+    "email-crm": "Email",
+    cro: "CRO",
+  };
+
   return (
-    <div className="w-full h-full min-h-[380px] sm:min-h-[440px] relative rounded-2xl overflow-hidden bg-[#0F1422] border border-white/10">
-      {/* Canvas Header Badge */}
-      <div className="absolute top-4 left-6 z-10 flex items-center justify-between right-6 pointer-events-none">
-        <div>
-          <span className="text-[11px] font-mono text-[#C8A25A] uppercase tracking-wider block">
-            3D Revenue Skyline
-          </span>
-          <span className="font-sans font-bold text-sm text-white">
-            Real-Time Stage Synthesis
+    <div className="w-full flex flex-col rounded-2xl overflow-hidden border border-white/10">
+      {/* Fixed-height 3D canvas container */}
+      <div className="relative bg-[#0F1422]" style={{ height: "420px" }}>
+        {/* Canvas Header Badge */}
+        <div className="absolute top-4 left-6 z-10 flex items-center justify-between right-6 pointer-events-none">
+          <div>
+            <span className="text-[11px] font-mono text-[#C8A25A] uppercase tracking-wider block">
+              3D Revenue Skyline
+            </span>
+            <span className="font-sans font-bold text-sm text-white">
+              Real-Time Stage Synthesis
+            </span>
+          </div>
+          <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+            WebGL Primitives · DPR 1.5
           </span>
         </div>
-        <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
-          WebGL Primitives · DPR 1.5
-        </span>
+
+        <Canvas
+          frameloop={isVisible ? "always" : "never"}
+          dpr={[1, 1.5]}
+          camera={{ position: [0, 1.8, 7.5], fov: 40 }}
+          gl={{
+            antialias: true,
+            powerPreference: "high-performance",
+            alpha: true,
+          }}
+          className="w-full h-full"
+        >
+          <ambientLight intensity={0.7} />
+          <directionalLight position={[5, 8, 5]} intensity={1.2} color="#FAF9F6" />
+          <pointLight position={[-4, 4, -2]} intensity={0.6} color="#60A5FA" />
+
+          {/* Stage Grid & Base */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
+            <planeGeometry args={[14, 10]} />
+            <meshStandardMaterial
+              color="#0A0E18"
+              roughness={0.8}
+              metalness={0.1}
+            />
+          </mesh>
+          <gridHelper args={[14, 14, "#C8A25A", "#1E293B"]} position={[0, 0, 0]} />
+
+          {/* Skyline Bars */}
+          <group position={[0, 0, 0]}>
+            {channels.map((ch, idx) => {
+              const height = maxRevenue > 0 ? (ch.revenue / maxRevenue) * 3.5 : 0.2;
+              return (
+                <SkylineBar
+                  key={ch.channelId}
+                  channel={ch}
+                  index={idx}
+                  total={channels.length}
+                  targetHeight={height}
+                  currency={currency}
+                  isHovered={hoveredId === ch.channelId}
+                  onHover={setHoveredId}
+                />
+              );
+            })}
+
+            {/* Golden Skyline Growth Spline */}
+            <SkylineGrowthLine channels={channels} maxRevenue={maxRevenue} />
+          </group>
+        </Canvas>
       </div>
 
-      <Canvas
-        frameloop={isVisible ? "always" : "never"}
-        dpr={[1, 1.5]}
-        camera={{ position: [0, 2.5, 6.2], fov: 42 }}
-        gl={{
-          antialias: true,
-          powerPreference: "high-performance",
-          alpha: true,
-        }}
-        className="w-full h-full"
-      >
-        <ambientLight intensity={0.7} />
-        <directionalLight position={[5, 8, 5]} intensity={1.2} color="#FAF9F6" />
-        <pointLight position={[-4, 4, -2]} intensity={0.6} color="#60A5FA" />
-
-        {/* Stage Grid & Base */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]}>
-          <planeGeometry args={[14, 10]} />
-          <meshStandardMaterial
-            color="#0A0E18"
-            roughness={0.8}
-            metalness={0.1}
-          />
-        </mesh>
-        <gridHelper args={[14, 14, "#C8A25A", "#1E293B"]} position={[0, 0, 0]} />
-
-        {/* Skyline Bars */}
-        <group position={[0, 0, 0]}>
-          {channels.map((ch, idx) => {
-            const height = maxRevenue > 0 ? (ch.revenue / maxRevenue) * 3.5 : 0.2;
-            return (
-              <SkylineBar
-                key={ch.channelId}
-                channel={ch}
-                index={idx}
-                total={channels.length}
-                targetHeight={height}
-                currency={currency}
-                isHovered={hoveredId === ch.channelId}
-                onHover={setHoveredId}
-              />
-            );
-          })}
-
-          {/* Golden Skyline Growth Spline */}
-          <SkylineGrowthLine channels={channels} maxRevenue={maxRevenue} />
-        </group>
-      </Canvas>
+      {/* HTML Legend row below canvas — no overlapping 3D text */}
+      <div className="bg-[#0A0E18] border-t border-white/5 px-4 py-3 flex flex-wrap gap-3 justify-center">
+        {channels.map((ch) => (
+          <div key={ch.channelId} className="flex items-center gap-2 min-w-0">
+            <span
+              className="w-2.5 h-2.5 rounded-sm shrink-0"
+              style={{ backgroundColor: ch.color }}
+              aria-hidden="true"
+            />
+            <span className="text-[11px] font-mono text-slate-300 whitespace-nowrap">
+              {CHANNEL_LABELS[ch.channelId] ?? ch.channelId}
+            </span>
+            <span className="text-[11px] font-mono font-bold text-[#C8A25A] tabular-nums whitespace-nowrap">
+              {formatCurrency(ch.revenue, currency)}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
