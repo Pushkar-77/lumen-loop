@@ -4,7 +4,7 @@ import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDelightStore } from "@/stores/delight";
 
-interface Ripple {
+interface ClickRing {
   id: number;
   x: number;
   y: number;
@@ -31,7 +31,7 @@ export function CustomCursor() {
   const [position, setPosition] = useState({ x: -100, y: -100 });
   const [isPointer, setIsPointer] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [ripples, setRipples] = useState<Ripple[]>([]);
+  const [rings, setRings] = useState<ClickRing[]>([]);
 
   useEffect(() => {
     if (isTouchDevice || prefersReducedMotion || reduceDelight) return;
@@ -72,17 +72,17 @@ export function CustomCursor() {
         return;
       }
 
-      const ripple: Ripple = {
+      const ring: ClickRing = {
         id: nextId++,
         x: e.clientX,
         y: e.clientY,
       };
 
-      setRipples((prev) => [...prev.slice(-8), ripple]);
+      setRings((prev) => [...prev.slice(-8), ring]);
 
       setTimeout(() => {
-        setRipples((prev) => prev.filter((r) => r.id !== ripple.id));
-      }, 750);
+        setRings((prev) => prev.filter((r) => r.id !== ring.id));
+      }, 500);
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
@@ -126,19 +126,21 @@ export function CustomCursor() {
         }}
       />
 
-      {/* Floating "+1 CTR" Click Ripples with normal word spacing */}
+      {/* Minimal Expanding Click Ring (1px Champagne Gold, expands from ~8px to ~40px, fades to 0 over 450ms) */}
       <AnimatePresence>
-        {ripples.map((ripple) => (
+        {rings.map((ring) => (
           <motion.div
-            key={ripple.id}
-            initial={{ opacity: 1, y: ripple.y - 12, x: ripple.x - 18, scale: 0.9 }}
-            animate={{ opacity: 0, y: ripple.y - 45, scale: 1.15 }}
+            key={ring.id}
+            initial={{ width: 8, height: 8, x: "-50%", y: "-50%", opacity: 0.6 }}
+            animate={{ width: 40, height: 40, x: "-50%", y: "-50%", opacity: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="fixed pointer-events-none z-[9997] select-none font-mono text-[11px] font-bold text-[#E8D5A3] drop-shadow-[0_0_8px_rgba(200,162,90,0.5)] tracking-normal"
-          >
-            +1 CTR
-          </motion.div>
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="fixed pointer-events-none z-[8900] rounded-full border border-[#C8A25A]/60 bg-transparent select-none"
+            style={{
+              left: ring.x,
+              top: ring.y,
+            }}
+          />
         ))}
       </AnimatePresence>
     </>
