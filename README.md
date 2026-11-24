@@ -112,3 +112,34 @@ npm run start
 ## Transparency & Content Honesty
 
 All client logos, case studies, metrics, team profiles, and testimonials are **Sample Illustrative Data** designed to showcase world-class engineering, design hierarchy, and full-funnel marketing architecture. All sample elements are explicitly labeled with `Sample` tags in the interface.
+
+---
+
+## Deployment
+
+1. Push to GitHub — Vercel auto-deploys on push to `main`.
+2. Set environment variables in Vercel project settings:
+   - `RESEND_API_KEY` — enables real email delivery via Resend. If unset, contact submissions are logged to the serverless function console (dev/demo fallback).
+   - `RESEND_FROM_EMAIL` — sender address (e.g. `hello@lumenloop.in`)
+   - `RESEND_TO_EMAIL` — recipient address for inbound leads
+   - `NEXT_PUBLIC_DEMO_MODE=true` — shows an expandable **Dev payload (JSON)** drawer after a contact form submission. Recommended for client demos; disable in production.
+
+> **Note on rate limiting**: The in-memory IP rate limiter (`5 req / 60s`) resets on every serverless cold start. For persistent cross-instance rate limiting, replace the in-memory `Map` in `src/app/api/contact/route.ts` with an external store such as [Upstash Redis](https://upstash.com/).
+
+---
+
+## Routes & Feature Status
+
+| Route | Status | Notes |
+|---|---|---|
+| `/` | Production | Hero 3D scene, marquee, services bento, process timeline, testimonials |
+| `/services` | Production | 6-service grid with Growth Stack Builder (drag-and-drop + keyboard) |
+| `/pricing` | Production | 3-tier hand-set pricing, comparison matrix, FAQ with JSON-LD |
+| `/roi-lab` | Production | Deterministic ROI engine, 3D Revenue Skyline (desktop), 2D fallback (mobile) |
+| `/work` | Production | Filterable case study grid, Before/After metric toggle |
+| `/work/[slug]` | Production | 6 static case study pages with SVG charts, generateStaticParams |
+| `/about` | Production | Studio story, 4 principles, approach, sample team grid |
+| `/contact` | Production | Zod-validated form, honeypot, rate limiting, Resend/dev fallback, confetti |
+| `/api/contact` | Production | POST endpoint — see deployment notes above |
+| `sitemap.xml` | Production | Auto-generated, includes all /work slugs |
+| `robots.txt` | Production | Disallows /api/, references sitemap |
