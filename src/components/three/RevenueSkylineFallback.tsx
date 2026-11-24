@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { ChannelRoiOutput, formatCurrency, Currency } from "@/lib/roi-engine";
+import { CANONICAL_CHANNEL_ORDER } from "./RevenueSkylineScene";
 
 interface RevenueSkylineFallbackProps {
   channels: ChannelRoiOutput[];
@@ -12,8 +13,21 @@ interface RevenueSkylineFallbackProps {
 export function RevenueSkylineFallback({
   channels,
   currency,
-  maxRevenue,
 }: RevenueSkylineFallbackProps) {
+  // Keep channel order identical to 3D scene and legend
+  const sortedChannels = useMemo(() => {
+    return [...channels].sort((a, b) => {
+      const idxA = CANONICAL_CHANNEL_ORDER.indexOf(a.channelId);
+      const idxB = CANONICAL_CHANNEL_ORDER.indexOf(b.channelId);
+      return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+    });
+  }, [channels]);
+
+  const maxActiveRevenue = useMemo(() => {
+    if (sortedChannels.length === 0) return 0;
+    return Math.max(...sortedChannels.map((c) => c.revenue), 1);
+  }, [sortedChannels]);
+
   return (
     <div
       role="region"
@@ -29,19 +43,26 @@ export function RevenueSkylineFallback({
             Channel Revenue Distribution
           </span>
         </div>
-        <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
-          2D Accessible Fallback
-        </span>
+        <div className="flex items-center gap-2">
+          {maxActiveRevenue > 0 && (
+            <span className="text-[10px] font-mono text-slate-300 bg-white/5 px-2.5 py-1 rounded border border-white/10 tabular-nums">
+              Tallest bar = <span className="text-[#C8A25A] font-bold">{formatCurrency(maxActiveRevenue, currency)}</span>
+            </span>
+          )}
+          <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+            2D Accessible Fallback
+          </span>
+        </div>
       </div>
 
-      {channels.length === 0 ? (
+      {sortedChannels.length === 0 ? (
         <div className="flex-1 flex items-center justify-center text-xs font-mono text-slate-400">
           Select at least one channel to render distribution
         </div>
       ) : (
         <div className="space-y-4 flex-1 flex flex-col justify-center">
-          {channels.map((ch) => {
-            const pct = maxRevenue > 0 ? Math.min(100, Math.round((ch.revenue / maxRevenue) * 100)) : 0;
+          {sortedChannels.map((ch) => {
+            const pct = maxActiveRevenue > 0 ? Math.min(100, Math.round((ch.revenue / maxActiveRevenue) * 100)) : 0;
             return (
               <div key={ch.channelId} className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
