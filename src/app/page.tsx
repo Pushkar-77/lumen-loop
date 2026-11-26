@@ -1,11 +1,12 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { siteConfig } from "@/content/site";
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Lumen Loop",
+  name: siteConfig.name,
   url: "https://lumen-loop-alpha.vercel.app",
   logo: "https://lumen-loop-alpha.vercel.app/favicon.ico",
   description:
@@ -19,7 +20,8 @@ const organizationJsonLd = {
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "Customer Support",
-    email: "hello@lumenloop.in",
+    email: siteConfig.contact.email,
+    telephone: siteConfig.contact.phone,
     availableLanguage: ["English", "Hindi"],
   },
   sameAs: [

@@ -1,8 +1,10 @@
 "use client";
 
 import React from "react";
+import { siteConfig } from "@/content/site";
+import { formatTelHref } from "@/lib/utils";
 import { TransitionLink } from "@/components/ui/TransitionLink";
-import { MapPin, Users, Zap, Shield, Eye, ArrowRight } from "lucide-react";
+import { MapPin, Users, Zap, Shield, Eye, ArrowRight, Mail, Phone } from "lucide-react";
 
 const PRINCIPLES = [
   {
@@ -228,15 +230,32 @@ export default function AboutPage() {
             <MapPin className="w-6 h-6 text-[#C8A25A]" aria-hidden="true" />
           </div>
           <h2 className="font-sans text-2xl font-bold text-white mb-2">Rooted in Pune, India</h2>
-          <p className="text-slate-300 text-xs sm:text-sm max-w-md mb-6 leading-relaxed">
+          <p className="text-slate-300 text-xs sm:text-sm max-w-md mb-5 leading-relaxed">
             Operating from Pune, Maharashtra (Studio address placeholder), serving high-ambition Indian consumer brands
             and global digital platforms with equal precision.
           </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-slate-300 mb-6">
+            <a
+              href={`mailto:${siteConfig.contact.email}`}
+              className="inline-flex items-center gap-1.5 hover:text-[#C8A25A] transition-colors"
+            >
+              <Mail className="w-3.5 h-3.5 text-[#C8A25A]" aria-hidden="true" />
+              <span>{siteConfig.contact.email}</span>
+            </a>
+            <span className="text-white/20" aria-hidden="true">·</span>
+            <a
+              href={formatTelHref(siteConfig.contact.phone)}
+              className="inline-flex items-center gap-1.5 hover:text-[#C8A25A] transition-colors"
+            >
+              <Phone className="w-3.5 h-3.5 text-[#C8A25A]" aria-hidden="true" />
+              <span>{siteConfig.contact.phone}</span>
+            </a>
+          </div>
           <TransitionLink
             href="/contact"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#C8A25A] text-[#0B0F19] font-bold text-sm font-mono shadow-md hover:scale-105 transition-transform"
           >
-            Start a Conversation
+            Get your free growth plan
             <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </TransitionLink>
         </div>

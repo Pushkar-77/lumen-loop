@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { siteConfig } from "@/content/site";
+import { formatTelHref } from "@/lib/utils";
 import { TransitionLink } from "@/components/ui/TransitionLink";
 import { usePreloaderStore } from "@/stores/preloader";
 import { useDelightStore } from "@/stores/delight";
@@ -119,27 +120,24 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Connect & Placeholder Contact */}
+          {/* Direct Inquiries */}
           <div className="flex flex-col gap-3">
             <span className="font-mono text-xs uppercase tracking-wider text-[#C8A25A]">
               Direct Inquiries
             </span>
-            <div className="flex flex-col gap-2 text-sm text-slate-400">
+            <div className="flex flex-col gap-2 text-sm text-slate-300">
               <a
                 href={`mailto:${siteConfig.contact.email}`}
-                className="hover:text-white transition-colors flex items-center gap-1.5"
+                className="hover:text-[#C8A25A] transition-colors inline-flex items-center gap-1.5"
               >
                 <span>{siteConfig.contact.email}</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-slate-500">
-                  Sample
-                </span>
               </a>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs text-slate-500">{siteConfig.contact.phone}</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-slate-500">
-                  Sample
-                </span>
-              </div>
+              <a
+                href={formatTelHref(siteConfig.contact.phone)}
+                className="hover:text-[#C8A25A] transition-colors inline-flex items-center gap-1.5 text-xs text-slate-300"
+              >
+                <span>{siteConfig.contact.phone}</span>
+              </a>
               <span className="text-xs text-[#E8D5A3] mt-1">{siteConfig.contact.hours}</span>
             </div>
           </div>

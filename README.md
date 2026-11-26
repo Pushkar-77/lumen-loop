@@ -51,9 +51,9 @@
 - `/services` — 6 filterable growth disciplines with 3D-tilt & click-to-flip cards + interactive Custom Growth Stack Builder (drag-and-drop & keyboard accessible).
 - `/pricing` — Retainers (Starter ₹24,999 / $299, Growth ₹59,999 / $699, Scale ₹1,49,999 / $1,799) with Monthly/Quarterly (-15%) toggle, comparison matrix, and FAQ.
 - `/roi-lab` — Interactive deterministic ROI calculation engine, lead source distribution, and 3D Revenue Skyline stage.
-- `/contact` — Growth brief intake form with pre-filled state and studio contact details (all addresses marked placeholder).
+- `/contact` — "Get your free growth plan" intake form with pre-filled brief chips, direct email/phone links, and Resend/demo fallback.
 - `/work` & `/work/[slug]` — 6 filterable case studies with interactive Before/After metric toggles, currency synchronization, single-scale SVG comparison charts, and dynamic static breakdown pages.
-- `/about` — *(Temporary Preview Placeholder)* Studio roots and operating principles for early review.
+- `/about` — Studio story, operating principles, methodology, sample team profiles, and Pune studio contact details.
 
 ---
 
@@ -74,17 +74,27 @@ This guarantees identical styling and module resolution across both dev server a
 
 ## Environment Variables
 
-Create a `.env.local` file with the following keys:
+Create a `.env.local` file (or configure these in Vercel Project Settings -> Environment Variables):
 
 ```env
-# Resend API Key for contact form (optional in development - will use simulation fallback)
+# Required for live email delivery via Resend (if unset, server logs submissions in demo fallback mode)
 RESEND_API_KEY=re_xxxxxxxxxxxx
-RESEND_FROM_EMAIL=hello@example.com
-RESEND_TO_EMAIL=growth@example.com
 
-# Demo Mode toggle: enables expandable JSON payload drawer upon form completion
+# Required recipient inbox where growth plan requests are sent
+RESEND_TO_EMAIL=your-inbox@example.com
+
+# Optional verified sender address (defaults to onboarding@resend.dev if unset)
+RESEND_FROM_EMAIL=onboarding@resend.dev
+
+# Optional Demo Mode toggle: enables expandable Dev payload (JSON) drawer on confirmation card
 NEXT_PUBLIC_DEMO_MODE=false
 ```
+
+### Variable Reference
+- **`RESEND_API_KEY`**: Server-side API key from [Resend](https://resend.com). When unset, `/api/contact` logs leads to the server console and returns `delivered: false` so the UI clearly reports demo mode instead of claiming the email was sent.
+- **`RESEND_TO_EMAIL`**: Destination inbox receiving `"New growth plan request: <name> (<company>)"` emails with `reply_to` set to the visitor's email.
+- **`RESEND_FROM_EMAIL`**: Sender identity passed in Resend's `from` field. Defaults to `onboarding@resend.dev` if omitted (verify a custom domain in Resend before using your own domain).
+- **`NEXT_PUBLIC_DEMO_MODE`**: Set to `true` to show the expandable **Dev payload (JSON)** drawer after form submission in production demos.
 
 ---
 
@@ -119,9 +129,9 @@ All client logos, case studies, metrics, team profiles, and testimonials are **S
 
 1. Push to GitHub — Vercel auto-deploys on push to `main`.
 2. Set environment variables in Vercel project settings:
-   - `RESEND_API_KEY` — enables real email delivery via Resend. If unset, contact submissions are logged to the serverless function console (dev/demo fallback).
-   - `RESEND_FROM_EMAIL` — sender address (e.g. `hello@lumenloop.in`)
-   - `RESEND_TO_EMAIL` — recipient address for inbound leads
+   - `RESEND_API_KEY` — enables real email delivery via Resend. If unset, contact submissions are logged to the serverless function console (demo fallback; UI does not claim the request was sent).
+   - `RESEND_TO_EMAIL` — recipient address for inbound growth plan leads
+   - `RESEND_FROM_EMAIL` — sender address (defaults to `onboarding@resend.dev` if unset)
    - `NEXT_PUBLIC_DEMO_MODE=true` — shows an expandable **Dev payload (JSON)** drawer after a contact form submission. Recommended for client demos; disable in production.
 
 > **Note on rate limiting**: The in-memory IP rate limiter (`5 req / 60s`) resets on every serverless cold start. For persistent cross-instance rate limiting, replace the in-memory `Map` in `src/app/api/contact/route.ts` with an external store such as [Upstash Redis](https://upstash.com/).

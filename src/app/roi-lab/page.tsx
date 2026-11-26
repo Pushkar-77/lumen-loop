@@ -19,7 +19,7 @@ import {
 
 export default function RoiLabPage() {
   const { currency, toggleCurrency } = useCurrencyStore();
-  const { setGrowthStack, setServices } = useBriefStore();
+  const { setGrowthStack, setServices, setRoiScenario } = useBriefStore();
 
   // Inputs state
   const isINR = currency === "INR";
@@ -82,6 +82,16 @@ export default function RoiLabPage() {
     };
     setGrowthStack(stack);
     setServices(roiOutput.channels.map((c) => c.channelName));
+    setRoiScenario({
+      monthlyBudget,
+      averageOrderValue,
+      currency,
+      totalLeads: roiOutput.totals.totalLeads,
+      totalCustomers: roiOutput.totals.totalCustomers,
+      totalRevenue: roiOutput.totals.totalRevenue,
+      blendedRoas: roiOutput.totals.blendedRoas,
+      channels: roiOutput.channels.map((c) => c.channelName),
+    });
   };
 
   const channelOptions = Object.values(ROI_BENCHMARKS);

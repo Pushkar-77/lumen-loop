@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Start a Conversation — Lumen Loop",
+  title: "Get Your Free Growth Plan — Lumen Loop",
   description:
-    "Tell us about your brand and growth goals. We review every submission personally and respond within 48 hours. No automated sales sequences.",
+    "Request a free illustrative growth plan for your business. Receive 3 channel opportunities, recommended channel mix, a 90-day roadmap with illustrative targets, and a reply within 24 business hours.",
   openGraph: {
-    title: "Start a Conversation — Lumen Loop",
+    title: "Get Your Free Growth Plan — Lumen Loop",
     description:
-      "Submit your brief and get a personalised response within 48 hours. No spam, no automated sequences.",
+      "Share your brand and goals for an illustrative growth plan within 24 business hours. No automated sales sequences.",
     type: "website",
   },
 };

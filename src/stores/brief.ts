@@ -8,15 +8,28 @@ export interface GrowthStackStages {
   conversion: string[];
 }
 
+export interface RoiScenarioSummary {
+  monthlyBudget: number;
+  averageOrderValue: number;
+  currency: "INR" | "USD";
+  totalLeads: number;
+  totalCustomers: number;
+  totalRevenue: number;
+  blendedRoas: number;
+  channels: string[];
+}
+
 interface BriefState {
   selectedServices: string[];
   selectedPlan: string | null;
   growthStack: GrowthStackStages;
+  roiScenario: RoiScenarioSummary | null;
   addService: (service: string) => void;
   removeService: (service: string) => void;
   setServices: (services: string[]) => void;
   setSelectedPlan: (plan: string | null) => void;
   setGrowthStack: (stack: GrowthStackStages) => void;
+  setRoiScenario: (scenario: RoiScenarioSummary | null) => void;
   clearBrief: () => void;
   init: () => void;
 }
@@ -31,6 +44,7 @@ export const useBriefStore = create<BriefState>((set, get) => ({
   selectedServices: [],
   selectedPlan: null,
   growthStack: defaultStack,
+  roiScenario: null,
   init: () => {
     if (typeof window !== "undefined") {
       try {
@@ -41,6 +55,7 @@ export const useBriefStore = create<BriefState>((set, get) => ({
             selectedServices: parsed.selectedServices || [],
             selectedPlan: parsed.selectedPlan || null,
             growthStack: parsed.growthStack || defaultStack,
+            roiScenario: parsed.roiScenario || null,
           });
         }
       } catch (e) {
@@ -73,8 +88,17 @@ export const useBriefStore = create<BriefState>((set, get) => ({
     set({ growthStack: stack });
     saveToSession({ ...get(), growthStack: stack });
   },
+  setRoiScenario: (scenario) => {
+    set({ roiScenario: scenario });
+    saveToSession({ ...get(), roiScenario: scenario });
+  },
   clearBrief: () => {
-    set({ selectedServices: [], selectedPlan: null, growthStack: defaultStack });
+    set({
+      selectedServices: [],
+      selectedPlan: null,
+      growthStack: defaultStack,
+      roiScenario: null,
+    });
     if (typeof window !== "undefined") {
       sessionStorage.removeItem(SESSION_KEY);
     }
@@ -85,6 +109,7 @@ function saveToSession(state: {
   selectedServices: string[];
   selectedPlan: string | null;
   growthStack: GrowthStackStages;
+  roiScenario: RoiScenarioSummary | null;
 }) {
   if (typeof window !== "undefined") {
     try {
@@ -94,6 +119,7 @@ function saveToSession(state: {
           selectedServices: state.selectedServices,
           selectedPlan: state.selectedPlan,
           growthStack: state.growthStack,
+          roiScenario: state.roiScenario,
         })
       );
     } catch {

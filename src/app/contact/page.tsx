@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { siteConfig } from "@/content/site";
 import { useBriefStore } from "@/stores/brief";
 import { useCurrencyStore } from "@/stores/currency";
+import { formatTelHref } from "@/lib/utils";
 import { TransitionLink } from "@/components/ui/TransitionLink";
 import {
   Sparkles,
@@ -17,13 +18,49 @@ import {
   ShieldCheck,
   Building2,
   ChevronDown,
+  AlertCircle,
 } from "lucide-react";
+
+interface DeliveryResponse {
+  delivered: boolean;
+  mode: "resend" | "demo";
+  refId: string;
+  timestamp: string;
+}
+
+const DELIVERABLES = [
+  {
+    title: "3 specific opportunities for your channels",
+    detail: "Practical fixes and quick improvements based on your search, ad accounts, and website.",
+  },
+  {
+    title: "A recommended channel mix and starting budget range",
+    detail: "Illustrative budget allocation across channels that suit your stage and order value.",
+  },
+  {
+    title: "A 90-day roadmap with targets",
+    detail: "Illustrative month-by-month milestones for planning (targets only, not guaranteed results).",
+  },
+  {
+    title: "A reply within 24 business hours",
+    detail: "Our team reviews your submission directly and follows up by email or phone.",
+  },
+];
+
+function formatScenarioMoney(amount: number, currency: "INR" | "USD"): string {
+  return new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
 
 export default function ContactPage() {
   const {
     selectedServices,
     selectedPlan,
     growthStack,
+    roiScenario,
     clearBrief,
     init,
   } = useBriefStore();
@@ -40,7 +77,7 @@ export default function ContactPage() {
     website: "",
     budget: "",
     channels: [] as string[],
-    notes: "",
+    goals: "",
   });
 
   // Hydrate channels from brief store on first load if available
@@ -58,8 +95,7 @@ export default function ContactPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submissionId, setSubmissionId] = useState("");
+  const [deliveryResult, setDeliveryResult] = useState<DeliveryResponse | null>(null);
   const [submitError, setSubmitError] = useState("");
   const [showDevPayload, setShowDevPayload] = useState(false);
   const [submittedPayload, setSubmittedPayload] = useState<Record<string, unknown> | null>(null);
@@ -127,12 +163,22 @@ export default function ContactPage() {
     setIsSubmitting(true);
     setSubmitError("");
 
+    const hasStack =
+      growthStack.awareness.length > 0 ||
+      growthStack.consideration.length > 0 ||
+      growthStack.conversion.length > 0;
+
     const payload = {
-      ...formData,
+      name: formData.name,
+      email: formData.email,
+      website: formData.website,
+      budget: formData.budget,
+      channels: formData.channels,
+      goals: formData.goals,
       selectedPlan: selectedPlan ?? undefined,
-      growthStack: (growthStack.awareness.length > 0 || growthStack.consideration.length > 0 || growthStack.conversion.length > 0)
-        ? growthStack
-        : undefined,
+      selectedServices: selectedServices.length > 0 ? selectedServices : undefined,
+      growthStack: hasStack ? growthStack : undefined,
+      roiScenario: roiScenario ?? undefined,
       _hp: "", // honeypot
     };
 
@@ -146,18 +192,24 @@ export default function ContactPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setSubmitError(data.error ?? "Something went wrong. Please try again.");
+        setSubmitError(
+          data.error ?? `We couldn't send your request. Please email ${siteConfig.contact.email} directly.`
+        );
         setIsSubmitting(false);
         return;
       }
 
       setSubmittedPayload(payload);
-      setSubmissionId(data.refId);
-      setIsSubmitted(true);
+      setDeliveryResult({
+        delivered: Boolean(data.delivered),
+        mode: data.mode === "resend" ? "resend" : "demo",
+        refId: data.refId,
+        timestamp: data.timestamp || new Date().toISOString(),
+      });
 
-      // Confetti burst (skipped under reduced motion)
+      // Confetti burst when request actually delivered (skipped under reduced motion)
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (!prefersReducedMotion) {
+      if (!prefersReducedMotion && data.delivered) {
         import("canvas-confetti").then(({ default: confetti }) => {
           confetti({
             particleCount: 80,
@@ -168,16 +220,24 @@ export default function ContactPage() {
         });
       }
     } catch {
-      setSubmitError("Network error. Your data was not lost — please try again.");
+      setSubmitError(
+        `We couldn't send your request. Your form details are safe — please try again or email ${siteConfig.contact.email} directly.`
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const hasStackAttached =
+    growthStack.awareness.length > 0 ||
+    growthStack.consideration.length > 0 ||
+    growthStack.conversion.length > 0;
+
   const hasBriefAttached =
     Boolean(selectedPlan) ||
     selectedServices.length > 0 ||
-    growthStack.awareness.length > 0;
+    hasStackAttached ||
+    Boolean(roiScenario);
 
   return (
     <div className="w-full min-h-screen pt-28 sm:pt-36 pb-20 bg-[#0B0F19] text-white">
@@ -189,22 +249,22 @@ export default function ContactPage() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Page Hero Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-[#C8A25A] mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C8A25A] animate-pulse" />
-            <span>Growth Sprints · Pune Studio</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C8A25A] animate-pulse" aria-hidden="true" />
+            <span>Free Growth Plan · Pune Studio</span>
           </div>
 
           <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-5">
-            Let&apos;s Build Something <br className="hidden sm:inline" />
+            Get your{" "}
             <span className="bg-gradient-to-r from-[#FAF9F6] via-[#E8D5A3] to-[#C8A25A] bg-clip-text text-transparent">
-              Measurable.
+              free growth plan
             </span>
           </h1>
 
           <p className="font-sans text-base sm:text-lg text-slate-300 leading-relaxed text-balance">
-            Share your current growth stage and targets. Our team will review your digital footprint
-            and return a technical, illustrative growth audit within 24 hours.
+            Tell us a little about your business and marketing goals. Our team will look over your
+            channels and share an illustrative plan within 24 business hours.
           </p>
         </div>
 
@@ -215,12 +275,17 @@ export default function ContactPage() {
               <Sparkles className="w-5 h-5 text-[#C8A25A] shrink-0 mt-0.5" aria-hidden="true" />
               <div>
                 <span className="text-xs font-mono text-[#C8A25A] font-bold uppercase tracking-wider block mb-1">
-                  Brief Attached
+                  Attached to Your Request
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {selectedPlan && (
                     <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-[#C8A25A]/10 border border-[#C8A25A]/30 text-[#C8A25A]">
                       Plan: {selectedPlan}
+                    </span>
+                  )}
+                  {roiScenario && (
+                    <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-[#C8A25A]/10 border border-[#C8A25A]/30 text-[#E8D5A3]">
+                      ROI Lab (Illustrative): {formatScenarioMoney(roiScenario.monthlyBudget, roiScenario.currency)}/mo · {roiScenario.blendedRoas}x est.
                     </span>
                   )}
                   {selectedServices.slice(0, 3).map((s) => (
@@ -248,39 +313,87 @@ export default function ContactPage() {
           </div>
         )}
 
-        {/* Success Card */}
-        {isSubmitted ? (
+        {/* Confirmation View */}
+        {deliveryResult ? (
           <div className="max-w-2xl mx-auto">
             <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-[#131928] to-[#0D1220] border border-[#C8A25A]/40 shadow-2xl text-center">
               <div className="w-14 h-14 rounded-2xl bg-[#C8A25A]/10 border border-[#C8A25A]/30 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle2 className="w-7 h-7 text-[#C8A25A]" aria-hidden="true" />
+                {deliveryResult.delivered ? (
+                  <CheckCircle2 className="w-7 h-7 text-[#C8A25A]" aria-hidden="true" />
+                ) : (
+                  <AlertCircle className="w-7 h-7 text-[#C8A25A]" aria-hidden="true" />
+                )}
               </div>
 
-              <div className="font-mono text-xs text-[#C8A25A] uppercase tracking-widest mb-2">
-                Brief Received
-              </div>
-              <h2 className="font-sans text-2xl sm:text-3xl font-extrabold text-white mb-3">
-                You&apos;re in the queue.
-              </h2>
-              <p className="text-slate-300 text-sm leading-relaxed mb-6">
-                Our team reviews every brief personally and will return a growth audit within 24 hours.
-                We will reach you at <span className="text-white font-semibold">{formData.email}</span>.
-              </p>
+              {deliveryResult.delivered ? (
+                <>
+                  <div className="font-mono text-xs text-[#C8A25A] uppercase tracking-widest mb-2">
+                    Request Sent
+                  </div>
+                  <h2 className="font-sans text-2xl sm:text-3xl font-extrabold text-white mb-3">
+                    We&apos;ve sent your request to our team.
+                  </h2>
+                  <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                    We will email or call you with your free growth plan within 24 business hours.
+                    Look out for a note sent to <span className="text-white font-semibold">{formData.email}</span>.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="font-mono text-xs text-[#C8A25A] uppercase tracking-widest mb-2">
+                    Demo Mode · Not Emailed
+                  </div>
+                  <h2 className="font-sans text-2xl sm:text-3xl font-extrabold text-white mb-3">
+                    Saved in demo preview only.
+                  </h2>
+                  <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                    Email delivery is not enabled on this server yet (<span className="font-mono text-xs">RESEND_API_KEY</span> is missing),
+                    so this form was <span className="text-white font-semibold">not sent to our team</span>.
+                    To get your growth plan directly, email{" "}
+                    <a
+                      href={`mailto:${siteConfig.contact.email}`}
+                      className="text-[#C8A25A] underline hover:text-white"
+                    >
+                      {siteConfig.contact.email}
+                    </a>{" "}
+                    or call{" "}
+                    <a
+                      href={formatTelHref(siteConfig.contact.phone)}
+                      className="text-[#C8A25A] underline hover:text-white"
+                    >
+                      {siteConfig.contact.phone}
+                    </a>
+                    .
+                  </p>
+                </>
+              )}
 
               {/* Boarding pass reference */}
               <div className="p-4 rounded-2xl bg-[#0B0F19] border border-white/10 mb-6 text-left space-y-3">
                 <div className="flex justify-between items-center border-b border-white/5 pb-3">
                   <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Reference ID</span>
-                  <span className="font-mono text-sm font-bold text-[#C8A25A]">{submissionId}</span>
+                  <span className="font-mono text-sm font-bold text-[#C8A25A]">{deliveryResult.refId}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Name</span>
                   <span className="font-mono text-xs text-white">{formData.name}</span>
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Company / Site</span>
+                  <span className="font-mono text-xs text-white truncate max-w-[260px]">{formData.website}</span>
+                </div>
                 {selectedPlan && (
                   <div className="flex justify-between items-center">
                     <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Plan</span>
                     <span className="font-mono text-xs text-[#60A5FA]">{selectedPlan}</span>
+                  </div>
+                )}
+                {roiScenario && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">ROI Scenario (Illustrative)</span>
+                    <span className="font-mono text-xs text-[#E8D5A3]">
+                      {formatScenarioMoney(roiScenario.monthlyBudget, roiScenario.currency)}/mo · {roiScenario.blendedRoas}x est.
+                    </span>
                   </div>
                 )}
                 {formData.channels.length > 0 && (
@@ -296,13 +409,17 @@ export default function ContactPage() {
                   </div>
                 )}
                 <div className="flex justify-between items-center border-t border-white/5 pt-3">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Expected Audit</span>
-                  <span className="font-mono text-xs text-white">Within 24 hours</span>
+                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Next Step</span>
+                  <span className="font-mono text-xs text-white">
+                    {deliveryResult.delivered
+                      ? "Email or call within 24 business hrs"
+                      : "Demo log only (email directly above)"}
+                  </span>
                 </div>
               </div>
 
-              <div className="text-xs text-slate-500 italic mb-4">
-                Response timelines are targets, not guaranteed service-level agreements.
+              <div className="text-xs text-slate-400 mb-6">
+                All channel figures and roadmap targets we share are illustrative planning estimates, not guaranteed results.
               </div>
 
               <TransitionLink
@@ -333,7 +450,17 @@ export default function ContactPage() {
                       id="dev-payload-drawer"
                       className="mt-3 p-4 rounded-xl bg-[#0B0F19] border border-white/10 text-[10px] font-mono text-slate-300 overflow-x-auto text-left"
                     >
-                      {JSON.stringify(submittedPayload, null, 2)}
+                      {JSON.stringify(
+                        {
+                          refId: deliveryResult.refId,
+                          timestamp: deliveryResult.timestamp,
+                          delivered: deliveryResult.delivered,
+                          mode: deliveryResult.mode,
+                          payload: submittedPayload,
+                        },
+                        null,
+                        2
+                      )}
                     </pre>
                   )}
                 </div>
@@ -343,7 +470,28 @@ export default function ContactPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 max-w-6xl mx-auto">
             {/* Form Column */}
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-8 space-y-6">
+              {/* What You'll Get Card */}
+              <div className="p-6 rounded-2xl bg-[#0F1422] border border-white/10">
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <h2 className="font-sans text-base font-bold text-white">What you&apos;ll get</h2>
+                  <span className="text-[10px] font-mono text-[#C8A25A] uppercase tracking-wider">
+                    All figures illustrative
+                  </span>
+                </div>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {DELIVERABLES.map((item) => (
+                    <li key={item.title} className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-[#C8A25A] shrink-0 mt-0.5" aria-hidden="true" />
+                      <div>
+                        <div className="text-xs font-semibold text-white">{item.title}</div>
+                        <p className="text-xs text-slate-400 leading-relaxed mt-0.5">{item.detail}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
               <form onSubmit={handleSubmit} noValidate className="space-y-6">
                 {/* Hidden honeypot */}
                 <input
@@ -403,19 +551,19 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                {/* Website */}
+                {/* Website / Company */}
                 <div>
                   <label htmlFor="contact-website" className="block text-xs font-mono text-slate-300 mb-2">
                     Company / Website URL <span className="text-[#C8A25A]" aria-hidden="true">*</span>
                   </label>
                   <input
                     id="contact-website"
-                    type="url"
+                    type="text"
                     autoComplete="url"
                     value={formData.website}
                     onChange={(e) => setFormData((p) => ({ ...p, website: e.target.value }))}
                     className={`w-full px-4 py-3 rounded-xl bg-[#0F1422] border text-white text-sm font-sans placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50 transition-colors ${errors.website ? "border-red-500/60" : "border-white/10 hover:border-white/20"}`}
-                    placeholder="https://yourcompany.com"
+                    placeholder="Acme Brands or https://yourcompany.com"
                     aria-required="true"
                     aria-describedby={errors.website ? "website-error" : undefined}
                   />
@@ -472,24 +620,24 @@ export default function ContactPage() {
                   </div>
                 </div>
 
-                {/* Notes */}
+                {/* Goals */}
                 <div>
-                  <label htmlFor="contact-notes" className="block text-xs font-mono text-slate-300 mb-2">
-                    Additional Context
+                  <label htmlFor="contact-goals" className="block text-xs font-mono text-slate-300 mb-2">
+                    Your Goals &amp; Current Bottlenecks
                   </label>
                   <textarea
-                    id="contact-notes"
+                    id="contact-goals"
                     rows={4}
-                    value={formData.notes}
-                    onChange={(e) => setFormData((p) => ({ ...p, notes: e.target.value }))}
+                    value={formData.goals}
+                    onChange={(e) => setFormData((p) => ({ ...p, goals: e.target.value }))}
                     className="w-full px-4 py-3 rounded-xl bg-[#0F1422] border border-white/10 hover:border-white/20 text-white text-sm font-sans placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50 transition-colors resize-y"
-                    placeholder="Your current growth challenges, funnel bottlenecks, or specific targets..."
+                    placeholder="Share your 3-month goals, what channels you run today, or what feels stuck..."
                   />
                 </div>
 
                 {/* Error banner */}
                 {submitError && (
-                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono" role="alert">
+                  <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-mono leading-relaxed" role="alert">
                     {submitError}
                   </div>
                 )}
@@ -504,12 +652,12 @@ export default function ContactPage() {
                   {isSubmitting ? (
                     <>
                       <span className="inline-block w-4 h-4 border-2 border-[#0B0F19]/40 border-t-[#0B0F19] rounded-full animate-spin" aria-hidden="true" />
-                      Sending brief...
+                      Sending your request...
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4" aria-hidden="true" />
-                      Send Growth Brief
+                      Send me my growth plan
                     </>
                   )}
                 </button>
@@ -543,7 +691,7 @@ export default function ContactPage() {
                     <span className="text-xs font-mono text-slate-400 block mb-0.5">Email</span>
                     <a
                       href={`mailto:${siteConfig.contact.email}`}
-                      className="text-sm text-white hover:text-[#C8A25A] transition-colors"
+                      className="text-sm text-white hover:text-[#C8A25A] transition-colors break-all"
                     >
                       {siteConfig.contact.email}
                     </a>
@@ -553,16 +701,21 @@ export default function ContactPage() {
                 <div className="flex items-start gap-3">
                   <Phone className="w-4 h-4 text-[#C8A25A] shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <span className="text-xs font-mono text-slate-400 block mb-0.5">Phone (Placeholder)</span>
-                    <span className="text-sm text-white">{siteConfig.contact.phone}</span>
+                    <span className="text-xs font-mono text-slate-400 block mb-0.5">Phone</span>
+                    <a
+                      href={formatTelHref(siteConfig.contact.phone)}
+                      className="text-sm text-white hover:text-[#C8A25A] transition-colors"
+                    >
+                      {siteConfig.contact.phone}
+                    </a>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <Building2 className="w-4 h-4 text-[#C8A25A] shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <span className="text-xs font-mono text-slate-400 block mb-0.5">Response Target</span>
-                    <span className="text-sm text-white">Within 24 hours (business days)</span>
+                    <span className="text-xs font-mono text-slate-400 block mb-0.5">Reply Window</span>
+                    <span className="text-sm text-white">Within 24 business hours</span>
                   </div>
                 </div>
               </div>
@@ -571,10 +724,10 @@ export default function ContactPage() {
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="w-4 h-4 text-[#C8A25A] shrink-0 mt-0.5" aria-hidden="true" />
                   <div>
-                    <span className="text-xs font-mono text-[#C8A25A] font-bold block mb-1">Our Commitment</span>
+                    <span className="text-xs font-mono text-[#C8A25A] font-bold block mb-1">Plain &amp; Honest Terms</span>
                     <p className="text-xs text-slate-400 leading-relaxed">
-                      Every brief is reviewed personally. We aim to respond within one business day,
-                      though this is a target, not a formal service-level agreement.
+                      We review every submission personally and reply within 24 business hours by email or phone.
+                      All plan projections are illustrative planning targets, not guaranteed financial outcomes.
                     </p>
                   </div>
                 </div>

@@ -10,11 +10,10 @@ export interface SiteConfig {
     timezone: string;
   };
   contact: {
-    email: string; // Placeholder contact email
-    phone: string; // Placeholder phone number
+    email: string;
+    phone: string;
     address: string;
     hours: string;
-    isPlaceholder: true; // Explicitly labelled as placeholder per specification
   };
   socials: {
     twitter: string;
@@ -51,13 +50,12 @@ export const siteConfig: SiteConfig = {
     full: "Pune, Maharashtra, India",
     timezone: "Asia/Kolkata",
   },
-  // PLACEHOLDER CONTACT DETAILS (Clearly labelled per specification)
+  // Contact details (street address remains a placeholder)
   contact: {
-    email: "hello@example.com", // Placeholder
-    phone: "+91 00000 00000", // Placeholder
+    email: "ppushkarpatil194@gmail.com",
+    phone: "+91 73870 05225",
     address: "Studio address (placeholder), Pune",
     hours: "Mon – Fri: 9:30 AM – 6:30 PM IST",
-    isPlaceholder: true,
   },
   socials: {
     twitter: "https://twitter.com/example",
